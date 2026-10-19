@@ -29,6 +29,7 @@ public sealed class MacOSIntegrationTests
     {
         var installer = Path.Combine(RepositoryRoot(), "installer", "macos");
         var root = ReadPlist(File.ReadAllText(Path.Combine(installer, "Info.plist")));
+        Assert.Equal("true", Property(root, "LSUIElement").Name.LocalName);
         var service = Property(root, "NSServices").Element("dict")!;
         Assert.Equal(MacOSServicesProvider.MenuItem, Property(Property(service, "NSMenuItem"), "default").Value);
         Assert.Equal(MacOSServicesProvider.Message, Property(service, "NSMessage").Value);

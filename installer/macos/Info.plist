@@ -14,6 +14,9 @@
     <key>CFBundleIconFile</key><string>filee.icns</string>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>NSHighResolutionCapable</key><true/>
+    <!-- FileOrbit is a menu-bar utility, not a document app. Running as an agent keeps it out of the Dock and makes
+         its floating radial window eligible to join other apps' full-screen Spaces. -->
+    <key>LSUIElement</key><true/>
     <!-- "Convert with FileOrbit" in Finder's right-click menu, answered by the running app (MacOSServicesProvider).
          ServicesMenu.strings in ko.lproj and zh-Hans.lproj translate the title. An empty NSRequiredContext keeps
          the service on by default. -->

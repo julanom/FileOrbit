@@ -35,7 +35,8 @@ working. All processing is local. There are no uploads, accounts, subscriptions 
 The menu appears immediately on the modifier tap and stays present when the modifier is released; the Finder drag ends
 it. Escape cancels. The Shortcuts page lets you change the modifier, mouse button, scope, gesture kind and selected
 wheel. On macOS the menu joins every desktop Space, including separate displays, Stage Manager sets and another app's
-full-screen Space, and is positioned within the display containing the pointer.
+full-screen Space, and is positioned within the display containing the pointer. The app is registered as a menu-bar
+agent so macOS treats the floating wheel as eligible to accompany other applications into those Spaces.
 
 ## Explicit gaps
 
