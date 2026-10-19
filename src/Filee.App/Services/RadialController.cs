@@ -30,6 +30,7 @@ public sealed class RadialController(
     WindowService windows,
     UserDataStore store,
     IPlatformServices platform,
+    FileActionService fileActions,
     ILogger<RadialController> log)
 {
     /// <summary>
@@ -62,14 +63,14 @@ public sealed class RadialController(
     /// invisible until files are dragged into it (FilesEntered); a gesture without files (text, a rubber-band
     /// selection, nothing at all) never shows anything and closes when the button is released.
     /// </summary>
-    public void ShowForDrag(int x, int y)
+    public void ShowForDrag(int x, int y, TriggerMenu menu = TriggerMenu.Convert)
     {
         ReleaseProgressToToast();
         var window = EnsureWindow();
         // A ring from an earlier conversion (finished or handed to the toast) must not keep this gesture's window up.
         window.DonutControl.LeaveProgressMode();
         _dropped = false;
-        viewModel.ResetForDrag();
+        viewModel.ResetForDrag(menu);
         window.DonutControl.AllowContextEdit = false;
         PlaceAndShow(window, x, y, activate: false);
 
@@ -82,16 +83,16 @@ public sealed class RadialController(
     }
 
     /// <summary>Opens the donut for known files (click mode).</summary>
-    public void ShowForFiles(int x, int y, IReadOnlyList<string> files)
+    public void ShowForFiles(int x, int y, IReadOnlyList<string> files, TriggerMenu menu = TriggerMenu.Convert)
     {
         if (files.Count == 0)
             return;
         ReleaseProgressToToast();
         var window = EnsureWindow();
         _dropped = false;
-        viewModel.Load(files, clickMode: true);
+        viewModel.Load(files, clickMode: true, menu);
         viewModel.FitToThisDonut();
-        window.DonutControl.AllowContextEdit = true;
+        window.DonutControl.AllowContextEdit = menu != TriggerMenu.Actions;
         PlaceAndShow(window, x, y, activate: true);
         window.DonutControl.PlayOpenAnimation();
     }
@@ -165,7 +166,7 @@ public sealed class RadialController(
         {
             _dropped = true;
             if (hit.Kind is DonutHitKind.Segment or DonutHitKind.SubSegment)
-                Convert(hit.Index, hit.Sub, files.Count > 0 ? files : viewModel.Files);
+                Invoke(hit.Index, hit.Sub, files.Count > 0 ? files : viewModel.Files);
             else
                 Close();
         };
@@ -182,8 +183,8 @@ public sealed class RadialController(
         };
 
         donut.ActiveIndexChanged += (_, index) => viewModel.ShowHint(index, donut.ActiveSubIndex, donut.IsCenterHot);
-        donut.SegmentInvoked += (_, index) => Convert(index, -1, viewModel.Files);
-        donut.SubSegmentInvoked += (_, hit) => Convert(hit.Group, hit.Sub, viewModel.Files);
+        donut.SegmentInvoked += (_, index) => Invoke(index, -1, viewModel.Files);
+        donut.SubSegmentInvoked += (_, hit) => Invoke(hit.Group, hit.Sub, viewModel.Files);
         donut.CenterInvoked += (_, _) => Close();
         donut.SegmentContextRequested += async (_, index) => await EditPresetAsync(index);
         donut.SubSegmentContextRequested += async (_, hit) => await EditPresetAsync(hit.Group, hit.Sub);
@@ -196,6 +197,48 @@ public sealed class RadialController(
 
         _window = window;
         return window;
+    }
+
+    private void Invoke(int index, int sub, IReadOnlyList<string> files)
+    {
+        if (viewModel.ActionAt(index) is { } action)
+        {
+            _ = RunActionAsync(action, files);
+            return;
+        }
+        Convert(index, sub, files);
+    }
+
+    private async Task RunActionAsync(FileActionKind action, IReadOnlyList<string> files)
+    {
+        if (_window is null || files.Count == 0)
+        {
+            Close();
+            return;
+        }
+
+        _dropped = true;
+        var pickerAction = action is FileActionKind.Copy or FileActionKind.Move;
+        var owner = _window;
+        try
+        {
+            if (pickerAction)
+                owner.Activate();
+            else
+                Close(animate: false);
+            await fileActions.ExecuteAsync(action, files, owner);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException
+                                   or PlatformNotSupportedException or TimeoutException)
+        {
+            log.LogWarning(ex, "File action {Action} failed", action);
+            await windows.MessageAsync(null, $"{action} failed: {ex.Message}");
+        }
+        finally
+        {
+            if (_visible)
+                Close(animate: false);
+        }
     }
 
     /// <summary>Converts with slice <paramref name="index"/>, or with slice <paramref name="sub"/> of that group's ring.</summary>

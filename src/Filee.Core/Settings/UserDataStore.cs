@@ -26,9 +26,9 @@ public sealed class UserDataStore
         _log = log ?? (ILogger)NullLogger.Instance;
     }
 
-    /// <summary>Default data directory: %APPDATA%\Filee on Windows, ~/Library/Application Support/Filee on macOS.</summary>
+    /// <summary>Default data directory for the FileOrbit fork.</summary>
     public static string DefaultDirectory =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Filee");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FileOrbit");
 
     public string Directory { get; }
 

@@ -76,7 +76,9 @@ public sealed class AppSettings
     /// <summary>Show the Explorer "Convert with Filee" context menu entry.</summary>
     public bool ContextMenuEnabled { get; set; } = true;
 
-    public bool CheckForUpdates { get; set; } = true;
+    // A fork must not install upstream Filee releases over itself. Updates can be re-enabled once FileOrbit has its
+    // own signed release feed.
+    public bool CheckForUpdates { get; set; }
 
     /// <summary>What closing the main window does. A value from a newer Filee reads as <see cref="CloseAction.Ask"/>.</summary>
     [JsonConverter(typeof(LenientEnumJsonConverter<CloseAction>))]
@@ -118,7 +120,7 @@ public sealed class AppSettings
     public int SuccessfulConversions { get; set; }
 
     /// <summary>Set once the "Is Filee helping you?" card (GitHub star / feedback) has been shown.</summary>
-    public bool FeedbackPromptShown { get; set; }
+    public bool FeedbackPromptShown { get; set; } = true;
 
     /// <summary>Folders whose new files are converted automatically (Settings → Watch folders).</summary>
     public List<Watching.WatchRule> WatchFolders { get; set; } = [];

@@ -114,11 +114,11 @@ public partial class RadialWindow : Window
             Donut.CollapseGroup();
     }
 
-    /// <summary>Local file paths in the drag data (folders and virtual items are ignored).</summary>
+    /// <summary>Local file and folder paths in the drag data (virtual items are ignored).</summary>
     private static IReadOnlyList<string> LocalFiles(DragEventArgs e) =>
         (e.DataTransfer.TryGetFiles() ?? [])
             .Select(item => item.TryGetLocalPath())
             .OfType<string>()
-            .Where(File.Exists)
+            .Where(path => File.Exists(path) || Directory.Exists(path))
             .ToList();
 }

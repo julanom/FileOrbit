@@ -4,7 +4,7 @@
         xmlns:vm="using:Filee.App.ViewModels"
         x:Class="Filee.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="Filee"
+        Title="FileOrbit"
         Icon="avares://Filee/Assets/Icons/filee.ico"
         Width="1080" Height="760" MinWidth="820" MinHeight="560"
         WindowStartupLocation="CenterScreen">
@@ -15,7 +15,7 @@
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="8,0,0,20">
           <Image Source="avares://Filee/Assets/Icons/filee.png" Width="30" Height="30" />
           <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="Filee" FontSize="18" FontWeight="Bold" />
+            <TextBlock Text="FileOrbit" FontSize="18" FontWeight="Bold" />
             <TextBlock Classes="caption" Text="{DynamicResource app.tagline}" />
           </StackPanel>
         </StackPanel>

@@ -103,6 +103,7 @@ public class UserDataStoreTests
         store.Settings.Language = "ko";
         store.Settings.Theme.Accent = "#1D9E75";
         store.Settings.Triggers[0].Modifiers = ModifierKeys.Alt | ModifierKeys.Shift;
+        store.Settings.Triggers[0].Menu = TriggerMenu.Actions;
         store.Presets.Add(new Preset { Id = "mine", Name = "Mine", TargetFormat = "webp", Image = { Quality = 42 } });
         store.Profiles[0].PresetIds.Insert(0, "mine");
         store.SaveSettings();
@@ -114,6 +115,7 @@ public class UserDataStoreTests
         Assert.Equal("ko", reloaded.Settings.Language);
         Assert.Equal("#1D9E75", reloaded.Settings.Theme.Accent);
         Assert.Equal(ModifierKeys.Alt | ModifierKeys.Shift, reloaded.Settings.Triggers[0].Modifiers);
+        Assert.Equal(TriggerMenu.Actions, reloaded.Settings.Triggers[0].Menu);
         Assert.Equal(42, reloaded.FindPreset("mine")!.Image.Quality);
         Assert.Equal("mine", reloaded.Profiles[0].PresetIds[0]);
     }

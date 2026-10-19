@@ -27,6 +27,7 @@ public sealed partial class TriggerGestureViewModel : ObservableObject
         _gesture = gesture;
         _save = save;
         Kinds = Enum.GetValues<TriggerKind>().Select(k => new Choice<TriggerKind>(k, loc[$"triggers.kind.{k}"])).ToList();
+        Menus = Enum.GetValues<TriggerMenu>().Select(m => new Choice<TriggerMenu>(m, loc[$"triggers.menu.{m}"])).ToList();
         Buttons = Enum.GetValues<TriggerMouseButton>().Where(b => b != TriggerMouseButton.None)
             .Select(b => new Choice<TriggerMouseButton>(b, loc[$"triggers.button.{b}"])).ToList();
         // The file manager has its own name on each system: Explorer, Finder, the Linux desktop's file manager.
@@ -40,6 +41,7 @@ public sealed partial class TriggerGestureViewModel : ObservableObject
 
         Enabled = gesture.Enabled;
         Kind = Kinds.First(k => k.Value == gesture.Kind);
+        Menu = Menus.First(m => m.Value == gesture.Menu);
         Ctrl = gesture.Modifiers.HasFlag(ModifierKeys.Ctrl);
         Alt = gesture.Modifiers.HasFlag(ModifierKeys.Alt);
         Shift = gesture.Modifiers.HasFlag(ModifierKeys.Shift);
@@ -54,6 +56,7 @@ public sealed partial class TriggerGestureViewModel : ObservableObject
 
     public TriggerGesture Gesture => _gesture;
     public IReadOnlyList<Choice<TriggerKind>> Kinds { get; }
+    public IReadOnlyList<Choice<TriggerMenu>> Menus { get; }
     public IReadOnlyList<Choice<TriggerMouseButton>> Buttons { get; }
     public IReadOnlyList<Choice<TriggerScope>> Scopes { get; }
     public string RecordLabel { get; }
@@ -65,6 +68,8 @@ public sealed partial class TriggerGestureViewModel : ObservableObject
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(UsesMouse), nameof(UsesKey), nameof(UsesThreshold), nameof(UsesHold))]
     private Choice<TriggerKind> _kind = null!;
+
+    [ObservableProperty] private Choice<TriggerMenu> _menu = null!;
 
     [ObservableProperty] private bool _ctrl;
     [ObservableProperty] private bool _alt;
@@ -83,10 +88,11 @@ public sealed partial class TriggerGestureViewModel : ObservableObject
     public bool UsesHold => Kind.Value == TriggerKind.Hold;
     public string KeyText => IsRecording ? RecordingLabel : string.IsNullOrEmpty(Key) ? "—" : Key;
     public string ThresholdText => DragThreshold == 0 ? SystemLabel : $"{DragThreshold}px";
-    public string Summary => GestureText.Describe(_gesture);
+    public string Summary => $"{Menu.Label} · {GestureText.Describe(_gesture)}";
 
     // Runs before OnPropertyChanged below, which reads every choice.
     partial void OnKindChanged(Choice<TriggerKind>? oldValue, Choice<TriggerKind> newValue) => Choices.Restore(oldValue, newValue, v => Kind = v);
+    partial void OnMenuChanged(Choice<TriggerMenu>? oldValue, Choice<TriggerMenu> newValue) => Choices.Restore(oldValue, newValue, v => Menu = v);
     partial void OnButtonChanged(Choice<TriggerMouseButton>? oldValue, Choice<TriggerMouseButton> newValue) => Choices.Restore(oldValue, newValue, v => Button = v);
     partial void OnScopeChanged(Choice<TriggerScope>? oldValue, Choice<TriggerScope> newValue) => Choices.Restore(oldValue, newValue, v => Scope = v);
 
@@ -99,6 +105,7 @@ public sealed partial class TriggerGestureViewModel : ObservableObject
 
         _gesture.Enabled = Enabled;
         _gesture.Kind = Kind.Value;
+        _gesture.Menu = Menu.Value;
         _gesture.Modifiers = (Ctrl ? ModifierKeys.Ctrl : 0) | (Alt ? ModifierKeys.Alt : 0) |
                              (Shift ? ModifierKeys.Shift : 0) | (Meta ? ModifierKeys.Meta : 0);
         _gesture.Button = Kind.Value == TriggerKind.KeyChord ? TriggerMouseButton.None : Button.Value;

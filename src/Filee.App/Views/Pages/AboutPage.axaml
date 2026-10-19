@@ -11,7 +11,7 @@
       <StackPanel Orientation="Horizontal" Spacing="18">
         <Image Source="avares://Filee/Assets/Icons/filee.png" Width="72" Height="72" />
         <StackPanel VerticalAlignment="Center" Spacing="4">
-          <TextBlock Text="Filee" FontSize="24" FontWeight="Bold" />
+          <TextBlock Text="FileOrbit" FontSize="24" FontWeight="Bold" />
           <TextBlock Classes="muted" Text="{Binding Version}" />
           <TextBlock Classes="muted" Text="{DynamicResource about.license}" />
           <Button Classes="ghost" Padding="0" Click="OnOpenRepository" Margin="0,4,0,0">
@@ -23,14 +23,14 @@
         </StackPanel>
       </StackPanel>
     </Border>
-    <!-- The sponsors right below Filee itself, while there are any -->
-    <Border Classes="card" IsVisible="{Binding #Supporters.IsVisible}">
+    <!-- Upstream sponsor UI is retained in source for attribution, but this fork does not solicit on its behalf. -->
+    <Border Classes="card" IsVisible="False">
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="{DynamicResource sponsor.thanks}" />
         <v:SupportersView x:Name="Supporters" ShowTitle="False" LogoHeight="40" />
       </StackPanel>
     </Border>
-    <Border Classes="card">
+    <Border Classes="card" IsVisible="False">
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="{DynamicResource about.updates}" />
         <ToggleSwitch Content="{DynamicResource general.check_updates}" IsChecked="{Binding CheckForUpdates}" />
@@ -46,7 +46,7 @@
         </WrapPanel>
       </StackPanel>
     </Border>
-    <Border Classes="card">
+    <Border Classes="card" IsVisible="False">
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="{DynamicResource about.support_title}" />
         <TextBlock Classes="muted" TextWrapping="Wrap" Text="{DynamicResource about.support_text}" />

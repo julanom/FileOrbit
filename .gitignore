@@ -4,6 +4,8 @@ obj/
 artifacts/
 publish/
 Releases/
+.dotnet-home/
+.nuget/
 
 # Downloaded conversion engines (see build/fetch-engines.ps1)
 engines/

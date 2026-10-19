@@ -13,6 +13,12 @@ namespace Filee.App.ViewModels;
 
 public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc, PresetAvailability availability) : ObservableObject
 {
+    private static readonly string[] ToolPresetIds =
+    [
+        "half-size", "rotate", "flip", "grayscale", "remove-background", "merge-pdf", "pdf-split",
+        "pdf-long-image", "pdf-slides", "zip-all", "extract",
+    ];
+
     [ObservableProperty] private IReadOnlyList<DonutItem> _items = [];
     [ObservableProperty] private string _centerTitle = "";
     [ObservableProperty] private string? _centerSubtitle;
@@ -46,6 +52,12 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
     /// <summary>Presets in slice order.</summary>
     public IReadOnlyList<Preset> Presets { get; private set; } = [];
 
+    /// <summary>File actions in slice order; populated only for the Actions wheel.</summary>
+    public IReadOnlyList<FileActionKind> Actions { get; private set; } = [];
+
+    /// <summary>The wheel selected by the gesture that opened this donut.</summary>
+    public TriggerMenu Menu { get; private set; } = TriggerMenu.Convert;
+
     /// <summary>For each slice, the presets its group fans out (empty for an ordinary preset).</summary>
     private IReadOnlyList<IReadOnlyList<Preset>> _subPresets = [];
 
@@ -55,6 +67,8 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
     /// </summary>
     public Preset? PresetAt(int index, int sub)
     {
+        if (Menu == TriggerMenu.Actions)
+            return null;
         if (index < 0 || index >= Items.Count)
             return null;
         if (sub < 0)
@@ -66,9 +80,12 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
 
     /// <summary>The preset slice <paramref name="index"/> shows, or slice <paramref name="sub"/> of its group's ring (to edit it).</summary>
     public Preset? PresetShownAt(int index, int sub) =>
-        index < 0 || index >= Presets.Count ? null
+        Menu == TriggerMenu.Actions || index < 0 || index >= Presets.Count ? null
         : sub < 0 ? Presets[index]
         : sub < _subPresets[index].Count ? _subPresets[index][sub] : null;
+
+    public FileActionKind? ActionAt(int index) =>
+        Menu == TriggerMenu.Actions && index >= 0 && index < Actions.Count ? Actions[index] : null;
 
     /// <summary>True when opened with known files (keyboard, context menu, drop zone): slices are clicked.</summary>
     public bool IsClickMode { get; private set; }
@@ -76,36 +93,49 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
     public bool HasFiles => Files.Count > 0;
 
     /// <summary>Drag mode before any file entered: an empty ring saying "Bring files here".</summary>
-    public void ResetForDrag()
+    public void ResetForDrag(TriggerMenu menu = TriggerMenu.Convert)
     {
+        Menu = menu;
         IsClickMode = false;
         Files = [];
         Presets = [];
+        Actions = [];
         _subPresets = [];
         ApplyAppearance();
         ReserveSubRing = store.Profiles.Any(profile => profile.PresetIds.Any(id => store.FindPreset(id)?.IsGroup == true));
         Items = [];
-        CenterTitle = loc["donut.center_drag"];
+        CenterTitle = loc[$"donut.center_drag.{menu}"];
         CenterSubtitle = null;
         DonutOpacity = 0;
         HitBackground = "#01000000";
     }
 
     /// <summary>Fills the donut for the given files.</summary>
-    public void Load(IReadOnlyList<string> files, bool clickMode)
+    public void Load(IReadOnlyList<string> files, bool clickMode, TriggerMenu? menu = null)
     {
+        if (menu is not null)
+            Menu = menu.Value;
         IsClickMode = clickMode;
         Files = files;
         DonutOpacity = 1;
         HitBackground = "Transparent";
         ApplyAppearance();
 
-        var profile = ProfileSelector.Select(store.Profiles, files);
         var formats = ProfileSelector.DetectFormats(files);
-        Presets = (profile?.PresetIds ?? [])
-            .Select(store.FindPreset)
-            .OfType<Preset>()
+        if (Menu == TriggerMenu.Actions)
+        {
+            LoadActions(files);
+            return;
+        }
+
+        IEnumerable<string> ids = Menu == TriggerMenu.Tools
+            ? ToolPresetIds
+            : ProfileSelector.Select(store.Profiles, files)?.PresetIds ?? [];
+        Presets = ids.Select(store.FindPreset).OfType<Preset>()
+            // The tools wheel is deliberately concise: unsupported operations are omitted instead of greyed out.
+            .Where(p => Menu != TriggerMenu.Tools || p.IsGroup || availability.Check(p, formats) is null)
             .ToList();
+        Actions = [];
 
         _subPresets = Presets
             .Select(p => (IReadOnlyList<Preset>)(p.IsGroup ? p.SubPresetIds : [])
@@ -148,10 +178,35 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
             };
         }).ToList();
 
-        CenterTitle = formats.Count == 1
-            ? loc.Format("donut.files_same", files.Count, formats[0].DisplayName)
-            : loc.Format("donut.files_mixed", files.Count);
+        CenterTitle = Menu == TriggerMenu.Tools
+            ? loc.Format("donut.tools_count", files.Count)
+            : formats.Count == 1
+                ? loc.Format("donut.files_same", files.Count, formats[0].DisplayName)
+                : loc.Format("donut.files_mixed", files.Count);
         CenterSubtitle = clickMode ? loc["donut.close_hint"] : null;
+    }
+
+    private void LoadActions(IReadOnlyList<string> files)
+    {
+        Presets = [];
+        _subPresets = [];
+        Actions = Enum.GetValues<FileActionKind>()
+            .Where(action => action != FileActionKind.AirDrop || OperatingSystem.IsMacOS())
+            .ToList();
+        Items = Actions.Select(action => new DonutItem
+        {
+            Id = $"action-{action.ToString().ToLowerInvariant()}",
+            Label = loc[$"action.{action}"],
+            Caption = action switch
+            {
+                FileActionKind.Shelf => loc["action.shelf_caption"],
+                FileActionKind.CopyPath => loc["action.path_caption"],
+                _ => null,
+            },
+        }).ToList();
+        ReserveSubRing = false;
+        CenterTitle = loc.Format("donut.actions_count", files.Count);
+        CenterSubtitle = IsClickMode ? loc["donut.close_hint"] : null;
     }
 
     /// <summary>Updates the centre hint for the emphasised slice (and slice <paramref name="sub"/> of its group's ring).</summary>

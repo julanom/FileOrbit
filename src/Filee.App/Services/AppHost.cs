@@ -59,6 +59,8 @@ public static class AppHost
         services.AddSingleton<EngineDownloadService>();
         services.AddSingleton<PresetAvailability>();
         services.AddSingleton<RadialViewModel>();
+        services.AddSingleton<ShelfService>();
+        services.AddSingleton<FileActionService>();
         services.AddSingleton<ConversionService>();
         services.AddSingleton<WatchFolderService>();
         services.AddSingleton<TriggerService>();

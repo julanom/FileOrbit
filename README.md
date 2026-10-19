@@ -1,3 +1,6 @@
+> **FileOrbit fork:** this checkout adds Shift/Command/Control radial wheels, macOS file actions and a floating shelf.
+> Start with [FILEORBIT.md](FILEORBIT.md). The upstream Filee README is preserved below for engine and format details.
+
 <p align="center">
   <a href="https://filee.sh"><img src="docs/media/banner-en.jpg" alt="Filee: Drag. Drop. Converted." width="100%"></a>
 </p>

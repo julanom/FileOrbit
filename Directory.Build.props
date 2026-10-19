@@ -14,10 +14,10 @@
          parameters of a member is fine (CS1573). -->
     <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
 
-    <Version>1.11.0</Version>
-    <Product>Filee</Product>
-    <Authors>Filee contributors</Authors>
-    <Copyright>Copyright (c) Filee contributors</Copyright>
+    <Version>1.11.0-fileorbit.1</Version>
+    <Product>FileOrbit</Product>
+    <Authors>FileOrbit contributors; based on Filee</Authors>
+    <Copyright>Copyright (c) Filee and FileOrbit contributors</Copyright>
 
     <!-- Single source of truth for the GitHub repository (used by the updater and the About page). -->
     <FileeRepositoryUrl>https://github.com/KnifeLemon/Filee</FileeRepositoryUrl>

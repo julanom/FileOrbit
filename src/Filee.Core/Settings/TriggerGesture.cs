@@ -46,6 +46,17 @@ public enum TriggerScope
     Anywhere,
 }
 
+/// <summary>Which FileOrbit wheel a gesture opens.</summary>
+public enum TriggerMenu
+{
+    /// <summary>Format conversion presets for the dragged files.</summary>
+    Convert,
+    /// <summary>Non-format-changing tools such as resize, rotate, split and merge.</summary>
+    Tools,
+    /// <summary>File-management actions such as AirDrop, shelf, copy and move.</summary>
+    Actions,
+}
+
 /// <summary>A user-configurable gesture that opens the donut toolbar.</summary>
 public sealed class TriggerGesture
 {
@@ -69,16 +80,30 @@ public sealed class TriggerGesture
 
     public TriggerScope Scope { get; set; } = TriggerScope.FileManager;
 
+    /// <summary>The wheel displayed when this gesture fires.</summary>
+    public TriggerMenu Menu { get; set; } = TriggerMenu.Convert;
+
     public TriggerGesture Clone() => (TriggerGesture)MemberwiseClone();
 
     /// <summary>Default gestures for the current OS.</summary>
     public static List<TriggerGesture> Defaults()
     {
-        // On macOS Ctrl+click means right-click, and Option already means "copy" in Finder.
-        var dragModifier = OperatingSystem.IsMacOS() ? ModifierKeys.Alt : ModifierKeys.Ctrl;
+        // FileOrbit's macOS interaction is intentionally based on tapping a modifier after Finder's drag has begun.
+        // GestureDetector's late-modifier path prevents Command/Control from changing Finder's initial drag semantics.
+        if (OperatingSystem.IsMacOS())
+        {
+            return
+            [
+                new() { Kind = TriggerKind.Drag, Modifiers = ModifierKeys.Shift, Button = TriggerMouseButton.Left, Menu = TriggerMenu.Convert },
+                new() { Kind = TriggerKind.Drag, Modifiers = ModifierKeys.Meta, Button = TriggerMouseButton.Left, Menu = TriggerMenu.Tools },
+                new() { Kind = TriggerKind.Drag, Modifiers = ModifierKeys.Ctrl, Button = TriggerMouseButton.Left, Menu = TriggerMenu.Actions },
+                new() { Kind = TriggerKind.KeyChord, Modifiers = ModifierKeys.Ctrl | ModifierKeys.Alt, Button = TriggerMouseButton.None, Key = "Space", Menu = TriggerMenu.Convert },
+            ];
+        }
+
         return
         [
-            new() { Kind = TriggerKind.Drag, Modifiers = dragModifier, Button = TriggerMouseButton.Left },
+            new() { Kind = TriggerKind.Drag, Modifiers = ModifierKeys.Ctrl, Button = TriggerMouseButton.Left },
             new() { Kind = TriggerKind.KeyChord, Modifiers = ModifierKeys.Ctrl | ModifierKeys.Alt, Button = TriggerMouseButton.None, Key = "Space" },
         ];
     }
