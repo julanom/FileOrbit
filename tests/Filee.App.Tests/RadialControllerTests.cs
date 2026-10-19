@@ -76,4 +76,20 @@ public class RadialControllerTests
         Assert.NotEmpty(vm.Items);
         radial.Close(animate: false);
     }
+
+    [AvaloniaFact]
+    public void A_hidden_donut_is_recreated_for_the_current_desktop_space()
+    {
+        TestServices.EnsureInitialized("en");
+        var radial = AppHost.Get<RadialController>();
+        radial.ShowForDrag(400, 400);
+        var first = radial.Window;
+        radial.Close(animate: false);
+
+        radial.ShowForDrag(600, 500);
+
+        Assert.NotSame(first, radial.Window);
+        Assert.True(radial.Window!.IsVisible);
+        radial.Close(animate: false);
+    }
 }

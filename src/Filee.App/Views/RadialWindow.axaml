@@ -1,6 +1,6 @@
 <!--
   Borderless, transparent, always-on-top window that hosts the live donut toolbar at the cursor.
-  It is created once and reused (shown/hidden) so it appears instantly.
+  A hidden instance is replaced before the next presentation so AppKit creates its native window in the active Space.
   ShowActivated=False: during a file drag it must not steal focus from Explorer, or the drag would break.
 -->
 <Window xmlns="https://github.com/avaloniaui"

@@ -195,8 +195,15 @@ public sealed class RadialController(
 
     private RadialWindow EnsureWindow()
     {
-        if (_window is not null)
+        if (_window is { IsVisible: true })
             return _window;
+
+        // A hidden NSWindow remains associated with the Space where AppKit first created it, even after its
+        // collection behaviour is changed. Reusing that window can therefore make a later gesture on another Space
+        // invisible. Retire it and let AppKit create the next native window in the currently active Space. The
+        // all-Spaces collection behaviour applied after Show remains useful for full-screen and Stage Manager.
+        _window?.Close();
+        _window = null;
 
         var window = new RadialWindow { DataContext = viewModel };
         var donut = window.DonutControl;
