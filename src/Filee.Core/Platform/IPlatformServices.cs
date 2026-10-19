@@ -62,8 +62,9 @@ public interface IPlatformServices
     void RevealInFileManager(string path);
 
     /// <summary>
-    /// Puts an always-on-top window back at the top of the z-order without activating it. Windows can push such a
-    /// window below normal ones (seen after the Photos app opened) while it still reports itself as topmost.
+    /// Configures an overlay window for the platform and puts it back at the top of the z-order without activating it.
+    /// On macOS this also makes the overlay join every Space and full-screen app; Windows can push a topmost window
+    /// below normal ones (seen after the Photos app opened) while it still reports itself as topmost.
     /// </summary>
     void RaiseTopmost(nint windowHandle);
 }

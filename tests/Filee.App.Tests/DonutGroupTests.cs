@@ -644,13 +644,14 @@ public class DonutGroupTests
         }
     }
 
-    [Theory]
+    [AvaloniaTheory]
     [InlineData(5, 5)]           // top-left corner
     [InlineData(1915, 1075)]     // bottom-right corner
     [InlineData(960, 3)]         // top edge
     [InlineData(2500, 540)]      // second monitor's cursor reported on this one: still pulled in
     public void Near_a_screen_edge_the_rings_of_groups_stay_on_screen(int x, int y)
     {
+        TestServices.EnsureInitialized("en");
         var area = new PixelRect(0, 0, 1920, 1080);
         const double radius = 150;
         var side = (int)Math.Ceiling(DonutMenu.SideFor(radius, subRing: true));
@@ -665,11 +666,29 @@ public class DonutGroupTests
         Assert.True(center.Y - ringReach >= area.Y && center.Y + ringReach <= area.Bottom, $"y {center.Y}");
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Away_from_the_edges_the_donut_is_centred_on_the_cursor()
     {
+        TestServices.EnsureInitialized("en");
         var side = (int)Math.Ceiling(DonutMenu.SideFor(150, subRing: true));
         var position = RadialController.WindowPosition(new PixelPoint(960, 540), new PixelRect(0, 0, 1920, 1080), side);
         Assert.Equal(new PixelPoint(960 - side / 2, 540 - side / 2), position);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(-1920, 0, 1920, 1080, -960, 540)]  // display to the left of the primary display
+    [InlineData(1920, -1200, 1920, 1200, 2880, -600)] // display above and to the right
+    public void Donut_is_centred_on_the_display_containing_the_pointer(
+        int screenX, int screenY, int screenWidth, int screenHeight, int cursorX, int cursorY)
+    {
+        TestServices.EnsureInitialized("en");
+        var side = (int)Math.Ceiling(DonutMenu.SideFor(150, subRing: true));
+        var area = new PixelRect(screenX, screenY, screenWidth, screenHeight);
+
+        var position = RadialController.WindowPosition(new PixelPoint(cursorX, cursorY), area, side);
+
+        Assert.Equal(new PixelPoint(cursorX - side / 2, cursorY - side / 2), position);
+        Assert.True(position.X >= area.X && position.X + side <= area.Right);
+        Assert.True(position.Y >= area.Y && position.Y + side <= area.Bottom);
     }
 }

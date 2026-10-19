@@ -117,19 +117,41 @@ internal static class NativeMethods
 
     internal static void RaiseTopmost(nint window)
     {
-        const nint canJoinAllSpaces = 1, moveToActiveSpace = 1 << 1;
-        const nint fullScreenPrimary = 1 << 7, fullScreenAuxiliary = 1 << 8, fullScreenNone = 1 << 9;
         var behavior = Send(window, sel_registerName("collectionBehavior"));
-        behavior = (behavior & ~(moveToActiveSpace | fullScreenPrimary | fullScreenNone)) | canJoinAllSpaces | fullScreenAuxiliary;
-        if (OperatingSystem.IsMacOSVersionAtLeast(13))
-        {
-            const nint primary = 1 << 16, auxiliary = 1 << 17, canJoinAllApplications = 1 << 18;
-            behavior = (behavior & ~(primary | auxiliary)) | canJoinAllApplications;
-        }
-        // Finder can occupy a full-screen Space that would otherwise hide another app's toolbar.
+        behavior = OverlayCollectionBehavior(behavior, OperatingSystem.IsMacOSVersionAtLeast(13));
+        // Make this a real cross-Space system overlay. Avalonia creates an ordinary managed window; leaving that bit
+        // in place while adding CanJoinAllSpaces gives AppKit contradictory instructions and can pin the reused wheel
+        // to the Space where it first appeared.
         SendInteger(window, sel_registerName("setCollectionBehavior:"), behavior);
+        SendBoolArgument(window, sel_registerName("setCanHide:"), false);
+        SendBoolArgument(window, sel_registerName("setHidesOnDeactivate:"), false);
         SendInteger(window, sel_registerName("setLevel:"), 3);
         SendVoid(window, sel_registerName("orderFrontRegardless"));
+    }
+
+    /// <summary>
+    /// NSWindowCollectionBehavior for FileOrbit's radial overlay. The constants are stable AppKit ABI values from
+    /// NSWindow.h. Each mutually-exclusive group is normalised instead of preserving Avalonia's managed-window bits.
+    /// </summary>
+    internal static nint OverlayCollectionBehavior(nint current, bool macOS13OrLater)
+    {
+        const nint canJoinAllSpaces = 1 << 0, moveToActiveSpace = 1 << 1;
+        const nint managed = 1 << 2, transient = 1 << 3, stationary = 1 << 4;
+        const nint participatesInCycle = 1 << 5, ignoresCycle = 1 << 6;
+        const nint fullScreenPrimary = 1 << 7, fullScreenAuxiliary = 1 << 8, fullScreenNone = 1 << 9;
+        const nint fullScreenAllowsTiling = 1 << 11, fullScreenDisallowsTiling = 1 << 12;
+        const nint primary = 1 << 16, auxiliary = 1 << 17, canJoinAllApplications = 1 << 18;
+
+        current &= ~(moveToActiveSpace |
+                     managed | transient | stationary |
+                     participatesInCycle | ignoresCycle |
+                     fullScreenPrimary | fullScreenAuxiliary | fullScreenNone |
+                     fullScreenAllowsTiling | fullScreenDisallowsTiling |
+                     primary | auxiliary | canJoinAllApplications);
+        current |= canJoinAllSpaces | transient | ignoresCycle | fullScreenAuxiliary | fullScreenDisallowsTiling;
+        if (macOS13OrLater)
+            current |= canJoinAllApplications;
+        return current;
     }
 
     private readonly struct AutoreleasePool : IDisposable
@@ -224,6 +246,9 @@ internal static class NativeMethods
 
     [DllImport(ObjC, EntryPoint = "objc_msgSend")]
     private static extern void SendVoid(nint receiver, nint selector);
+
+    [DllImport(ObjC, EntryPoint = "objc_msgSend")]
+    private static extern void SendBoolArgument(nint receiver, nint selector, [MarshalAs(UnmanagedType.I1)] bool value);
 
     [DllImport(ObjC, EntryPoint = "objc_msgSend")]
     private static extern void SendInteger(nint receiver, nint selector, nint value);

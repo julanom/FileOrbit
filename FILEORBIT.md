@@ -8,6 +8,8 @@ FileOrbit's three radial workflows and native file actions.
 
 - Start a Finder drag, then tap **Shift** for conversions, **Command** for tools, or **Control** for file actions. The
   wheel appears on the key tap, stays open when the key is released and fills from Finder's dragged selection.
+- The radial wheel is a transient macOS overlay that follows the pointer across displays, every desktop Space, Stage
+  Manager sets and other apps' full-screen Spaces.
 - Each gesture is independently editable in Settings → Shortcuts, including the wheel it opens.
 - Folders now pass through the radial drop target for applicable actions.
 - The Actions wheel implements AirDrop, Shelf, Copy, Move, Copy Path and Open in Terminal.

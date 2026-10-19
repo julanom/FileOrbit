@@ -14,7 +14,7 @@
          parameters of a member is fine (CS1573). -->
     <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
 
-    <Version>1.12.0-fileorbit.2</Version>
+    <Version>1.12.0-fileorbit.3</Version>
     <Product>FileOrbit</Product>
     <Authors>FileOrbit contributors; based on Filee</Authors>
     <Copyright>Copyright (c) Filee and FileOrbit contributors</Copyright>
