@@ -32,8 +32,9 @@ working. All processing is local. There are no uploads, accounts, subscriptions 
 | Tools | Command | Applicable resize/rotate/flip/grayscale/background, PDF merge/split/compress/page-image, video frame extraction and archive tools |
 | Actions | Control | AirDrop, Shelf, Copy, Move, Copy Path and Open in Terminal |
 
-The menu stays present when the modifier is released; the Finder drag ends it. Escape cancels. The Shortcuts page lets
-you change the modifier, mouse button, scope, gesture kind and selected wheel.
+The menu appears immediately on the modifier tap and stays present when the modifier is released; the Finder drag ends
+it. Escape cancels. The Shortcuts page lets you change the modifier, mouse button, scope, gesture kind and selected
+wheel.
 
 ## Explicit gaps
 
@@ -42,6 +43,7 @@ you change the modifier, mouse button, scope, gesture kind and selected wheel.
 - Interactive audio/video timeline trimming is **not implemented**; media format/codec/resolution conversion and
   subtitle extraction are implemented through FFmpeg.
 - The global Finder gesture needs Accessibility access and depends on macOS input/drag behavior. The hook does not
-  claim file URLs itself: FileOrbit places an invisible native drop destination at the pointer and only reveals the
-  wheel after Finder supplies actual file URLs. The main-window drop zone and Finder service are fallback paths.
+  obtain file URLs from raw input events: FileOrbit shows the wheel immediately, pre-fills it from Finder's selection,
+  and still requires the live native drop to land on a slice. The main-window drop zone and Finder service are fallback
+  paths.
 - The delivered development build is ad-hoc signed and not notarized.

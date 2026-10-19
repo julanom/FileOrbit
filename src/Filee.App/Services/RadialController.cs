@@ -1,9 +1,8 @@
 // Opens, fills and closes the live donut toolbar.
 //
 // Drag mode  (modifier + drag in Explorer):
-//   gesture detected → an invisible window waits at the cursor (not activated) → DragEnter brings the file list →
-//   the donut pops out → drop on a slice converts / drop in the hole or release elsewhere closes. Without files
-//   (text, a rubber-band selection) nothing ever shows.
+//   gesture detected → the donut appears at the cursor (not activated) → Finder selection or DragEnter brings
+//   the file list and fills its slices → drop on a slice converts / drop in the hole or release elsewhere closes.
 // Click mode (keyboard shortcut, context menu, drop zone):
 //   files are known up front → donut appears activated → click a slice to convert, right-click to edit,
 //   Esc / click outside closes.
@@ -56,7 +55,7 @@ public sealed class RadialController(
     private readonly HashSet<string> _formatRequestsOffered = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// How long a drag that never brought files may keep the invisible window up, in case the button release is
+    /// How long a drag that never brought files may keep the window up, in case the button release is
     /// missed (the system dropped the input hook, a UAC prompt took the desktop): the window catches clicks.
     /// </summary>
     private static readonly TimeSpan EmptyDragLimit = TimeSpan.FromSeconds(10);
@@ -66,11 +65,10 @@ public sealed class RadialController(
     internal RadialWindow? Window => _window;
 
     /// <summary>
-    /// Drag gesture started at the given physical screen point. The window is placed under the cursor but stays
-    /// invisible until files are dragged into it (FilesEntered); a gesture without files (text, a rubber-band
-    /// selection, nothing at all) never shows anything and closes when the button is released.
+    /// Drag gesture started at the given physical screen point. The wheel appears immediately. Its slices are filled
+    /// by <see cref="SupplyDragFiles"/> or when the native drag enters the window.
     /// </summary>
-    public void ShowForDrag(int x, int y, TriggerMenu menu = TriggerMenu.Convert)
+    public int ShowForDrag(int x, int y, TriggerMenu menu = TriggerMenu.Convert)
     {
         ReleaseProgressToToast();
         var window = EnsureWindow();
@@ -82,6 +80,7 @@ public sealed class RadialController(
         viewModel.ResetForDrag(menu);
         window.DonutControl.AllowContextEdit = false;
         PlaceAndShow(window, x, y, activate: false);
+        window.DonutControl.PlayOpenAnimation();
 
         var generation = ++_dragGeneration;
         DispatcherTimer.RunOnce(() =>
@@ -89,6 +88,21 @@ public sealed class RadialController(
             if (generation == _dragGeneration && _visible && !viewModel.HasFiles && !viewModel.IsClickMode)
                 Close(animate: false);
         }, EmptyDragLimit);
+        return generation;
+    }
+
+    /// <summary>
+    /// Supplies Finder's current selection to a still-active drag. macOS does not guarantee a DragEnter event for a
+    /// window created underneath an already-running drag, so this lets the visible wheel show useful slices at once.
+    /// </summary>
+    public void SupplyDragFiles(int generation, IReadOnlyList<string> files)
+    {
+        if (files.Count == 0 || generation != _dragGeneration || !_visible || _dropped || viewModel.IsClickMode)
+            return;
+        if (SameFiles(files, viewModel.Files))
+            return;
+        viewModel.Load(files, clickMode: false);
+        _window?.DonutControl.PlayOpenAnimation();
     }
 
     /// <summary>Opens the donut for known files (click mode).</summary>
@@ -118,7 +132,7 @@ public sealed class RadialController(
             log.LogInformation("Drag gesture ended without a drag entering the donut{Elevation}{Held}",
                 Program.Elevation.ShellCannotReachFilee ? " (Filee runs as administrator: Windows blocks drops from Explorer)" : "",
                 LogThrottle.HeldText(held));
-        // Nothing was brought to the donut: the window is invisible but catches clicks, so go right away.
+        // Nothing was brought to the donut, so go right away.
         if (!viewModel.HasFiles && !_window!.DonutControl.IsInProgressMode)
         {
             Close(animate: false);

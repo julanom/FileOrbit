@@ -565,7 +565,7 @@ public class RenderTests
     }
 
     [AvaloniaFact]
-    public void Donut_toolbar_waits_for_files_in_drag_mode()
+    public void Donut_toolbar_appears_immediately_in_drag_mode()
     {
         TestServices.EnsureInitialized("en");
         var vm = AppHost.Get<RadialViewModel>();
@@ -575,8 +575,8 @@ public class RenderTests
         Pump();
 
         Assert.Empty(vm.Items);
-        // Nothing shows until files are dragged in (a Ctrl + drag without files must not open anything).
-        Assert.Equal(0, vm.DonutOpacity);
+        // The ring appears on the modifier tap; slices arrive with Finder selection or native DragEnter.
+        Assert.Equal(1, vm.DonutOpacity);
         Save(window, "donut-drag-waiting.png");
         vm.Load([@"C:\photos\a.jpg"], clickMode: false);
         Assert.Equal(1, vm.DonutOpacity);

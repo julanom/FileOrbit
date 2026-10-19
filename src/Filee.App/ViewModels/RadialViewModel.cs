@@ -35,14 +35,13 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
     [ObservableProperty] private bool _reserveSubRing;
 
     /// <summary>
-    /// 0 while a drag gesture waits for files, 1 otherwise. The gesture starts before anyone knows what is being
-    /// dragged (a file, text, or nothing: Ctrl + a rubber-band selection), so the donut only appears when files enter.
+    /// Opacity of the live wheel. It is visible as soon as a drag gesture fires; its slices are populated when the
+    /// Finder selection is resolved or the native drag enters the window.
     /// </summary>
     [ObservableProperty] private double _donutOpacity = 1;
 
     /// <summary>
-    /// Background of the window while the donut is hidden: practically invisible, but not fully transparent, so
-    /// Windows still delivers the drag to this window and the files can arrive.
+    /// Background of the drag target window.
     /// </summary>
     [ObservableProperty] private string _hitBackground = "Transparent";
 
@@ -92,7 +91,7 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
 
     public bool HasFiles => Files.Count > 0;
 
-    /// <summary>Drag mode before any file entered: an empty ring saying "Bring files here".</summary>
+    /// <summary>Drag mode before file URLs arrive: a visible ring saying "Bring files here".</summary>
     public void ResetForDrag(TriggerMenu menu = TriggerMenu.Convert)
     {
         Menu = menu;
@@ -106,8 +105,8 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
         Items = [];
         CenterTitle = loc[$"donut.center_drag.{menu}"];
         CenterSubtitle = null;
-        DonutOpacity = 0;
-        HitBackground = "#01000000";
+        DonutOpacity = 1;
+        HitBackground = "Transparent";
     }
 
     /// <summary>Fills the donut for the given files.</summary>

@@ -14,6 +14,15 @@ public class GestureDetectorTests
 
     private static readonly TriggerGesture CtrlDrag = new() { Kind = TriggerKind.Drag, Modifiers = ModifierKeys.Ctrl, Button = TriggerMouseButton.Left };
 
+    [Theory]
+    [InlineData("LeftShift", ModifierKeys.Shift)]
+    [InlineData("RightControl", ModifierKeys.Ctrl)]
+    [InlineData("LeftAlt", ModifierKeys.Alt)]
+    [InlineData("LeftMeta", ModifierKeys.Meta)]
+    [InlineData("Space", ModifierKeys.None)]
+    public void Modifier_key_names_are_mapped(string key, ModifierKeys expected) =>
+        Assert.Equal(expected, TriggerService.ModifierForKey(key));
+
     [Fact]
     public void Drag_fires_after_threshold_with_exact_modifiers()
     {
@@ -58,6 +67,33 @@ public class GestureDetectorTests
         detector.MouseMove(50, 0, ModifierKeys.Ctrl, TriggerMouseButton.Left);
 
         Assert.Equal(1, started);
+    }
+
+    [Fact]
+    public void Modifier_key_press_fires_an_active_drag_without_another_mouse_move()
+    {
+        var detector = Create(CtrlDrag);
+        var started = 0;
+        detector.DragStarted += (_, _, _) => started++;
+
+        detector.MouseDown(TriggerMouseButton.Left, 0, 0, ModifierKeys.None);
+        detector.MouseMove(30, 0, ModifierKeys.None, TriggerMouseButton.Left);
+        detector.KeyDown("LeftControl", ModifierKeys.Ctrl);
+
+        Assert.Equal(1, started);
+    }
+
+    [Fact]
+    public void Modifier_key_press_before_pointer_becomes_a_drag_does_not_fire()
+    {
+        var detector = Create(CtrlDrag);
+        var started = 0;
+        detector.DragStarted += (_, _, _) => started++;
+
+        detector.MouseDown(TriggerMouseButton.Left, 0, 0, ModifierKeys.None);
+        detector.KeyDown("LeftControl", ModifierKeys.Ctrl);
+
+        Assert.Equal(0, started);
     }
 
     [Fact]

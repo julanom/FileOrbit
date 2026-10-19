@@ -118,7 +118,14 @@ public sealed class TriggerService : IDisposable
             _hook.MouseReleased += (_, e) => _detector.MouseUp(Map(e.Data.Button), e.Data.X, e.Data.Y);
             _hook.MouseDragged += (_, e) => OnMove(e);
             _hook.MouseMoved += (_, e) => OnMove(e);
-            _hook.KeyPressed += (_, e) => _detector.KeyDown(KeyName(e.Data.KeyCode), Map(e.RawEvent.Mask));
+            _hook.KeyPressed += (_, e) =>
+            {
+                var key = KeyName(e.Data.KeyCode);
+                // Some macOS event taps report the flags as they were immediately before a modifier-key event.
+                // Include the key being pressed so tapping Shift/Command/Control can trigger a live Finder drag
+                // without requiring a later mouse move.
+                _detector.KeyDown(key, Map(e.RawEvent.Mask) | ModifierForKey(key));
+            };
             // Own the actual Run thread. SharpHook's RunAsync task completes BEFORE its finally
             // clears the native callback, so awaiting that task alone is not a safe restart barrier.
             var hook = _hook;
@@ -216,6 +223,15 @@ public sealed class TriggerService : IDisposable
         var name = code.ToString();
         return name.StartsWith("Vc", StringComparison.Ordinal) ? name[2..] : name;
     }
+
+    internal static ModifierKeys ModifierForKey(string key) => key switch
+    {
+        "Shift" or "LeftShift" or "RightShift" => ModifierKeys.Shift,
+        "Control" or "Ctrl" or "LeftControl" or "RightControl" => ModifierKeys.Ctrl,
+        "Alt" or "LeftAlt" or "RightAlt" => ModifierKeys.Alt,
+        "Meta" or "Command" or "LeftMeta" or "RightMeta" => ModifierKeys.Meta,
+        _ => ModifierKeys.None,
+    };
 
     /// <summary>
     /// Checks every two seconds whether the user switched Filee on under Accessibility, then starts the gestures;

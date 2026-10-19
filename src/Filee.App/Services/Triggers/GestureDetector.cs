@@ -18,6 +18,9 @@ public sealed class GestureDetector
     private Armed? _armed;
     private bool _dragActive;
     private bool _lateRejected; // scope check failed for this drag; don't re-check on every move
+    private TriggerMouseButton _heldButton;
+    private int _buttonDownX, _buttonDownY;
+    private bool _buttonMovedPastThreshold;
     private int _lastX, _lastY;
 
     private sealed record Armed(TriggerGesture Gesture, TriggerMouseButton Button, int X, int Y, long Token);
@@ -61,6 +64,10 @@ public sealed class GestureDetector
             _lastY = y;
             _armed = null;
             _lateRejected = false;
+            _heldButton = button;
+            _buttonDownX = x;
+            _buttonDownY = y;
+            _buttonMovedPastThreshold = false;
             if (Paused)
                 return;
 
@@ -89,6 +96,12 @@ public sealed class GestureDetector
         {
             _lastX = x;
             _lastY = y;
+            if (heldButton != TriggerMouseButton.None)
+            {
+                _heldButton = heldButton;
+                if (Math.Abs(x - _buttonDownX) > SystemDragThreshold || Math.Abs(y - _buttonDownY) > SystemDragThreshold)
+                    _buttonMovedPastThreshold = true;
+            }
             fire = _armed is null ? DetectLateModifier(x, y, modifiers, heldButton) : DetectDragPastThreshold(x, y);
             if (fire is not null)
                 _dragActive = true;
@@ -143,6 +156,8 @@ public sealed class GestureDetector
             ended = _dragActive;
             _dragActive = false;
             _lateRejected = false;
+            _heldButton = TriggerMouseButton.None;
+            _buttonMovedPastThreshold = false;
         }
         if (ended)
             DragEnded?.Invoke(x, y);
@@ -169,21 +184,35 @@ public sealed class GestureDetector
     /// <summary>A key went down. <paramref name="key"/> is the key name without the "Vc" prefix, e.g. "Space".</summary>
     public void KeyDown(string key, ModifierKeys modifiers)
     {
-        TriggerGesture? fire;
+        TriggerGesture? chord;
+        TriggerGesture? drag = null;
         int x, y;
         lock (_lock)
         {
             if (Paused)
                 return;
-            fire = _gestures.FirstOrDefault(g =>
+            chord = _gestures.FirstOrDefault(g =>
                 g.Kind == TriggerKind.KeyChord &&
                 string.Equals(g.Key, key, StringComparison.OrdinalIgnoreCase) &&
                 g.Modifiers == modifiers);
             (x, y) = (_lastX, _lastY);
-            if (fire is not null && !ScopeFilter(fire, x, y))
-                fire = null;
+            if (chord is not null && !ScopeFilter(chord, x, y))
+                chord = null;
+
+            // On macOS the intended gesture is: begin a normal Finder drag, then tap Shift/Command/Control.
+            // A modifier press is itself enough to open the wheel; waiting for another mouse-move event made a tap
+            // look broken when the user held the pointer still after pressing the key.
+            if (chord is null && !_dragActive && !_lateRejected && _armed is null && _buttonMovedPastThreshold &&
+                _heldButton != TriggerMouseButton.None && modifiers != ModifierKeys.None)
+            {
+                drag = DetectLateModifier(x, y, modifiers, _heldButton);
+                if (drag is not null)
+                    _dragActive = true;
+            }
         }
-        if (fire is not null)
-            KeyChordTriggered?.Invoke(fire, x, y);
+        if (chord is not null)
+            KeyChordTriggered?.Invoke(chord, x, y);
+        if (drag is not null)
+            DragStarted?.Invoke(drag, x, y);
     }
 }

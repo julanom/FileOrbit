@@ -72,7 +72,26 @@ public partial class App : Application
         var triggers = AppHost.Get<TriggerService>();
         var radial = AppHost.Get<RadialController>();
         var platform = AppHost.Get<IPlatformServices>();
-        triggers.DragStarted += (_, e) => radial.ShowForDrag(e.X, e.Y, e.Gesture?.Menu ?? TriggerMenu.Convert);
+        triggers.DragStarted += async (_, e) =>
+        {
+            var menu = e.Gesture?.Menu ?? TriggerMenu.Convert;
+            var generation = radial.ShowForDrag(e.X, e.Y, menu);
+            // AppKit may not send DragEnter when a new window appears under an already-running Finder drag. Finder's
+            // selection contains the files being dragged, so prefill the wheel while the native drop remains active.
+            if (!OperatingSystem.IsMacOS())
+                return;
+            try
+            {
+                var files = await Task.Run(platform.GetFileManagerSelection);
+                radial.SupplyDragFiles(generation, files);
+            }
+            catch (Exception ex) when (ex is not OutOfMemoryException)
+            {
+                // The wheel is already visible and native DragEnter can still supply the files. Avoid interrupting a
+                // live drag with a dialog (Automation permission may be granted later from the selection shortcut).
+                log.LogDebug(ex, "Could not prefill the macOS drag wheel from Finder selection");
+            }
+        };
         triggers.DragEnded += (_, _) => radial.OnDragGestureEnded();
         triggers.SelectionGesture += async (_, e) =>
         {

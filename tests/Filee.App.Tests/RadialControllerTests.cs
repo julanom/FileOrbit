@@ -1,10 +1,11 @@
-// The drag-wait donut is an invisible, topmost window that catches clicks so a drag can reach it: it must close when
+// The drag-wait donut is a topmost window that catches the live drag: it must close when
 // the gesture ends without files, even after a conversion left the ring behind (issue: desktop icons stopped reacting
 // to clicks until Filee quit).
 
 using Avalonia.Headless.XUnit;
 using Filee.App.Controls;
 using Filee.App.Services;
+using Filee.App.ViewModels;
 
 namespace Filee.App.Tests;
 
@@ -28,7 +29,7 @@ public class RadialControllerTests
     }
 
     [AvaloniaFact]
-    public void A_drag_without_files_after_a_conversion_closes_the_invisible_window()
+    public void A_drag_without_files_after_a_conversion_closes_the_window()
     {
         TestServices.EnsureInitialized("en");
         var radial = AppHost.Get<RadialController>();
@@ -56,5 +57,23 @@ public class RadialControllerTests
 
         Assert.False(radial.IsVisible);
         Assert.False(radial.Window.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void Active_drag_accepts_finder_selection_before_native_drag_enter()
+    {
+        TestServices.EnsureInitialized("en");
+        var radial = AppHost.Get<RadialController>();
+        var generation = radial.ShowForDrag(400, 400);
+        var vm = Assert.IsType<RadialViewModel>(radial.Window!.DataContext);
+
+        Assert.Equal(1, vm.DonutOpacity);
+        Assert.False(vm.HasFiles);
+
+        radial.SupplyDragFiles(generation, ["/tmp/photo.jpg"]);
+
+        Assert.True(vm.HasFiles);
+        Assert.NotEmpty(vm.Items);
+        radial.Close(animate: false);
     }
 }
