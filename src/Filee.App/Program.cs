@@ -266,6 +266,10 @@ internal static class Program
     public static AppBuilder BuildAvaloniaApp() =>
         AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            // FileOrbit is a menu-bar utility. Avalonia defaults ShowInDock to true and otherwise promotes the
+            // LSUIElement app back to a regular activation policy, making its overlay ineligible for another app's
+            // full-screen Space even when the NSWindow itself has CanJoinAllApplications.
+            .With(new MacOSPlatformOptions { ShowInDock = false })
             .ConfigureFonts(fonts => fonts.AddFontCollection(new FileeFontCollection()))
 #if DEBUG
             .WithDeveloperTools()
