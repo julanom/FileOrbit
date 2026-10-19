@@ -19,6 +19,7 @@ using Filee.App.ViewModels;
 using Filee.App.Views;
 using Filee.Core.Conversion;
 using Filee.Core.Platform;
+using Filee.Core.Profiles;
 using Filee.Core.Settings;
 using Microsoft.Extensions.Logging;
 
@@ -47,6 +48,12 @@ public sealed class RadialController(
     private JobViewModel? _lastRingJob;   // for "click the ✓ to open the folder"
     private IDisposable? _handOffTimer;
     private int _dragGeneration;
+    private bool _dragReachedDonut;
+
+    /// <summary>A gesture over something that isn't a file drag (a rubber-band selection) is common: a line now and then.</summary>
+    private static readonly LogThrottle Throttle = new(TimeSpan.FromMinutes(1));
+    private bool _converted;   // a conversion started from the files on the donut now
+    private readonly HashSet<string> _formatRequestsOffered = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// How long a drag that never brought files may keep the invisible window up, in case the button release is
@@ -70,6 +77,8 @@ public sealed class RadialController(
         // A ring from an earlier conversion (finished or handed to the toast) must not keep this gesture's window up.
         window.DonutControl.LeaveProgressMode();
         _dropped = false;
+        _dragReachedDonut = false;
+        _converted = false;
         viewModel.ResetForDrag(menu);
         window.DonutControl.AllowContextEdit = false;
         PlaceAndShow(window, x, y, activate: false);
@@ -90,6 +99,7 @@ public sealed class RadialController(
         ReleaseProgressToToast();
         var window = EnsureWindow();
         _dropped = false;
+        _converted = false;
         viewModel.Load(files, clickMode: true, menu);
         viewModel.FitToThisDonut();
         window.DonutControl.AllowContextEdit = menu != TriggerMenu.Actions;
@@ -102,6 +112,12 @@ public sealed class RadialController(
     {
         if (!_visible || viewModel.IsClickMode)
             return;
+        // No drag ever entered the donut's window: nothing was dragged (a rubber-band selection), or Windows kept
+        // Explorer's drag out (Filee runs as administrator). Tells "the donut didn't react" reports apart.
+        if (!_dragReachedDonut && Throttle.TryEnter("no-drag-enter", out var held))
+            log.LogInformation("Drag gesture ended without a drag entering the donut{Elevation}{Held}",
+                Program.Elevation.ShellCannotReachFilee ? " (Filee runs as administrator: Windows blocks drops from Explorer)" : "",
+                LogThrottle.HeldText(held));
         // Nothing was brought to the donut: the window is invisible but catches clicks, so go right away.
         if (!viewModel.HasFiles && !_window!.DonutControl.IsInProgressMode)
         {
@@ -145,6 +161,22 @@ public sealed class RadialController(
             });
         else
             window.Hide();
+        OfferFormatRequest();
+    }
+
+    /// <summary>
+    /// The donut closed on files Filee can't read at all (".ncm"): offer to request the format, once per extension
+    /// while Filee runs. Files it reads, even mixed with unknown ones, get a conversion and the toast instead.
+    /// </summary>
+    private void OfferFormatRequest()
+    {
+        if (_converted || viewModel.Files.Count == 0 || ProfileSelector.DetectFormats(viewModel.Files).Count > 0)
+            return;
+        var extensions = FormatRequest.UnknownExtensions(viewModel.Files).Where(_formatRequestsOffered.Add).ToList();
+        if (extensions.Count == 0)
+            return;
+        log.LogInformation("Donut closed on files Filee can't read: {Extensions}", FormatRequest.Label(extensions));
+        windows.ShowFormatRequestNotice(extensions);
     }
 
     private RadialWindow EnsureWindow()
@@ -155,6 +187,7 @@ public sealed class RadialController(
         var window = new RadialWindow { DataContext = viewModel };
         var donut = window.DonutControl;
 
+        window.DragEntered += () => _dragReachedDonut = true;
         window.FilesEntered += files =>
         {
             if (viewModel.IsClickMode || SameFiles(files, viewModel.Files))
@@ -257,6 +290,7 @@ public sealed class RadialController(
             Close();
             return;
         }
+        _converted = true;
         ShowProgress(job);
     }
 

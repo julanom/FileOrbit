@@ -8,14 +8,14 @@ working. All processing is local. There are no uploads, accounts, subscriptions 
 |---|---|---|---|
 | Images | JPG, PNG, WEBP, AVIF, TIFF, BMP, GIF, APNG, ICO, ICNS, JXL, JPEG 2000, PSD/PSB, TGA, PPM, HEIC, QOI, DDS, PCX, MNG, CUR, XCF, camera RAW, DICOM, OpenEXR, HDR and more | Image formats listed at left, PDF, traced SVG; resize, grayscale, rotate, flip, background removal presets | Built in for most routes; HEIC/video-backed routes may need FFmpeg |
 | Vector | SVG/SVGZ, EMF, WMF, AI, EPS/PS, CDR, VSD, CGM, ODG/FODG | PDF, raster images, SVG/SVGZ, DXF/DWG, EPS/PS, EMF, WMF, ODG | Partial; Ghostscript or LibreOffice for marked legacy routes |
-| PDF | PDF | DOCX, HWPX, TXT, PNG, JPG, TIFF, CBZ, PPTX page images; merge, split, page ranges, margin trimming | Built in for core PDF work; some document routes use optional engines |
+| PDF | PDF | DOCX, HWPX, TXT, PNG, JPG, TIFF, CBZ, PPTX page images; merge, split, compress, page ranges, margin trimming | Built in for core PDF work; optional Ghostscript can compete for the smallest compressed result |
 | Documents | DOCX/DOCM/DOTX, EML/MSG, DOC, ODT/FODT/OTT, RTF, WPS/WPD, Pages and more | PDF, DOCX, HWPX, EPUB, TXT, HTML; MSG → EML; ODT/FODT/OTT | Built in for modern core routes; LibreOffice for many legacy formats |
 | Spreadsheets | XLSX/XLSM/XLS/XLT, ODS/OTS/FODS, CSV/TSV, Numbers/ET | PDF, XLSX, ODS, CSV, TSV, JSON, HWPX, HTML | Built in for XLSX/CSV/TSV core; LibreOffice for legacy/vendor formats |
 | Presentations | PPTX/PPTM/POTX/PPSX, PPT, ODP/OTP/FODP, Keynote | PDF, PNG, JPG, DOCX, HWPX; OTP | Partial; LibreOffice is needed for many legacy/vendor inputs |
 | HWP | HWP, HWPX | PDF, PNG, DOCX, HWP ↔ HWPX, TXT, Markdown, HTML | Built in through Filee's HWP engines |
 | Text/markup | TXT, Markdown, HTML, reStructuredText, LaTeX, Org, AsciiDoc, Typst, MediaWiki, DocBook, Jupyter, Textile, man, OPML | PDF, DOCX, HWPX, EPUB, mutual markup conversions, PPTX slides | Markdown core built in; broad markup routes need Pandoc |
 | E-books | EPUB, KEPUB, MOBI/AZW family, FB2, CBZ/CBR/CB7, HTMLZ/TXTZ, LIT, LRF, CHM, PDB and more | PDF, EPUB, KEPUB, DOCX, TXT, HTML, HWPX, MOBI, AZW3 | Partial; calibre is required for several proprietary formats |
-| Video | MP4, MOV, MKV, WEBM, AVI, WMV, FLV, MPEG, TS/M2TS, 3GP, OGV, VOB and more | MP4 (H.264/HEVC/AV1), WEBM, MOV, MKV, AVI, GIF, APNG, MP3, M4A, 720p, subtitle extraction | Optional FFmpeg engine |
+| Video | MP4, MOV, MKV, WEBM, AVI, WMV, FLV, MPEG, TS/M2TS, 3GP, OGV, VOB and more | MP4 (H.264/HEVC/AV1), WEBM, MOV, MKV, AVI, GIF, APNG, MP3, M4A, 720p, subtitle extraction, every-frame PNG/JPG extraction, VideoToolbox hardware encoding | Optional FFmpeg engine |
 | Audio | MP3, M4A/AAC, WAV, FLAC, OGG/OPUS, WMA, AIFF, AMR, APE, WavPack, TTA, DSD, DTS, AC3/E-AC3 and more | MP3, M4A (AAC/ALAC), WAV, FLAC, OGG, OPUS, AAC, WavPack, TTA, W64, AC3/E-AC3 | Optional FFmpeg engine |
 | Subtitles | SRT, ASS/SSA, WebVTT, SAMI, LRC, TTML, MicroDVD, SCC | Mutual conversion to UTF-8 subtitle formats | Built in |
 | Archives | ZIP, 7Z, RAR, TAR and compressed TAR variants, GZ, ISO, CAB, DMG, ALZ, EGG and more | Safe extraction; ZIP, 7Z, TAR, TAR.GZ; combine arbitrary items into one ZIP | Built in for core routes; 7-Zip package for extended formats; traversal protection retained |
@@ -29,7 +29,7 @@ working. All processing is local. There are no uploads, accounts, subscriptions 
 | Wheel | Default modifier while dragging | What it contains |
 |---|---:|---|
 | Conversions | Shift | The selected file profile's valid output presets |
-| Tools | Command | Applicable resize/rotate/flip/grayscale/background, PDF merge/split/page-image and archive tools |
+| Tools | Command | Applicable resize/rotate/flip/grayscale/background, PDF merge/split/compress/page-image, video frame extraction and archive tools |
 | Actions | Control | AirDrop, Shelf, Copy, Move, Copy Path and Open in Terminal |
 
 The menu stays present when the modifier is released; the Finder drag ends it. Escape cancels. The Shortcuts page lets

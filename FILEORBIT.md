@@ -1,7 +1,7 @@
 # FileOrbit
 
 FileOrbit is a macOS-focused fork of [Filee](https://github.com/KnifeLemon/Filee) at upstream commit
-`e2dbc00f0623963d5ade4972b4113c6bf943d5c0`. It keeps Filee's offline conversion engine and MIT license, and adds
+`a1be20cefad36ea9bfa1b3bb923e3199b78de992` (Filee 1.12.0 plus its Spanish localization). It keeps Filee's offline conversion engine and MIT license, and adds
 FileOrbit's three radial workflows and native file actions.
 
 ## What changed
@@ -15,6 +15,8 @@ FileOrbit's three radial workflows and native file actions.
   spaces without shell interpolation, and reject copying a folder into itself.
 - FileOrbit has its own bundle id (`com.fileorbit.app`), settings directory and app identity, so it can coexist with
   Filee. Upstream self-update UI is disabled because installing a Filee release over this fork would be unsafe.
+- The 1.12 update adds PDF compression and PDF-to-PowerPoint, video frame extraction and hardware encoding, lower idle
+  memory use, more reliable gesture recovery, long e-book fixes, and Spanish and Polish interfaces.
 
 ## Build and run
 

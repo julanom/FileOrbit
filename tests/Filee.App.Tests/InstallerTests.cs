@@ -88,8 +88,9 @@ public class InstallerTests
         var marker = typeof(EngineInstaller).GetField("MarkerName", BindingFlags.NonPublic | BindingFlags.Static)?.GetRawConstantValue();
         Assert.Contains($"EngineMarker = '{marker}';", Script);
         Assert.Equal(
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Filee", "engines"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FileOrbit", "engines"),
             EngineEnvironment.DownloadRoot);
+        // This is the preserved upstream Windows installer; FileOrbit's delivered installer is installer/macos/install.sh.
         Assert.Contains(@"ExpandConstant('{localappdata}\Filee\engines\')", Script);
     }
 }

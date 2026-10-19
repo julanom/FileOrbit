@@ -16,7 +16,7 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
     private static readonly string[] ToolPresetIds =
     [
         "half-size", "rotate", "flip", "grayscale", "remove-background", "merge-pdf", "pdf-split",
-        "pdf-long-image", "pdf-slides", "zip-all", "extract",
+        "compress-pdf", "pdf-long-image", "pdf-slides", "extract-frames-png", "extract-frames-jpg", "zip-all", "extract",
     ];
 
     [ObservableProperty] private IReadOnlyList<DonutItem> _items = [];

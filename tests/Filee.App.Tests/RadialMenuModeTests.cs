@@ -24,4 +24,17 @@ public sealed class RadialMenuModeTests
         Assert.Contains(FileActionKind.Terminal, viewModel.Actions);
         Assert.Equal(viewModel.Actions.Count, viewModel.Items.Count);
     }
+
+    [AvaloniaFact]
+    public void Tools_wheel_includes_the_new_pdf_compression_and_slides_tools()
+    {
+        TestServices.EnsureInitialized("en");
+        var viewModel = AppHost.Get<RadialViewModel>();
+
+        viewModel.Load(["/tmp/report.pdf"], clickMode: true, TriggerMenu.Tools);
+
+        Assert.Equal(TriggerMenu.Tools, viewModel.Menu);
+        Assert.Contains(viewModel.Items, item => item.Id == "compress-pdf");
+        Assert.Contains(viewModel.Items, item => item.Id == "pdf-slides");
+    }
 }
