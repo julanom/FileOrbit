@@ -575,7 +575,8 @@ public class RenderTests
         Pump();
 
         Assert.Empty(vm.Items);
-        // The ring appears on the modifier tap; slices arrive with Finder selection or native DragEnter.
+        // A subtle waiting ring appears on the modifier tap; real slices arrive with Finder selection or native
+        // DragEnter. The waiting render is intentionally not an opaque white disc.
         Assert.Equal(1, vm.DonutOpacity);
         Save(window, "donut-drag-waiting.png");
         vm.Load([@"C:\photos\a.jpg"], clickMode: false);

@@ -91,6 +91,7 @@ public sealed partial class DonutMenu : Control
     private const double OpenDuration = 0.42;
     private const double OpenStagger = 0.028;
     private const double DragStartDistance = 5;
+    private const double WaitingRingOpacity = 0.18;
 
     // Pencil (Material "edit") path in a 24×24 box.
     private static readonly Geometry PencilIcon = Geometry.Parse(
@@ -803,8 +804,11 @@ public sealed partial class DonutMenu : Control
 
         if (n == 0)
         {
+            // Finder selection reaches the drag gesture shortly after this first frame. An opaque placeholder made
+            // that frame look like a solid white flash before the real slices arrived. Keep the instant visual cue,
+            // but make the waiting ring deliberately subtle; the centre still identifies the selected wheel.
             var ring = CreateRing(center, r1, r2);
-            context.DrawGeometry(WithOpacity(SliceBrush, SliceOpacity), BorderPen(), ring);
+            context.DrawGeometry(WithOpacity(SliceBrush, SliceOpacity * WaitingRingOpacity), BorderPen(), ring);
             if (_dropTargetIndex >= 0)
                 context.DrawGeometry(WithOpacity(AccentBrush, 0.35), null, ring);
         }
