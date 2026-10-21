@@ -16,7 +16,7 @@ public sealed class ThemeService(IPlatformServices platform)
 {
     /// <summary>Accent swatches offered in the Theme page.</summary>
     public static readonly IReadOnlyList<string> Swatches =
-        ["#7F77DD", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#BA7517", "#639922", "#5F5E5A"];
+        ["#2785E6", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#BA7517", "#639922", "#5F5E5A"];
 
     /// <summary>
     /// theme.json colour names → the brushes in Styles/Soft.axaml they replace. Must cover exactly
@@ -50,7 +50,9 @@ public sealed class ThemeService(IPlatformServices platform)
         // Accent colour + derived shades, corner radii and the font order (shared with the installer).
         SoftPalette.ApplyAccent(res, Color.TryParse(theme.Accent, out var parsed) ? parsed : Color.Parse(SoftPalette.DefaultAccent));
         SoftPalette.ApplyCornerRadius(res, theme.CornerRadius);
-        res["AppFontFamily"] = SoftPalette.FontFamilyFor(language);
+        var systemFont = OperatingSystem.IsMacOS() ? ".AppleSystemUIFont, "
+            : OperatingSystem.IsWindows() ? "Segoe UI Variable, Segoe UI, " : "Inter, Noto Sans, ";
+        res["AppFontFamily"] = new FontFamily(systemFont + SoftPalette.FontFamilies(language));
         SoftPalette.ApplyFlowDirection(res, language);
 
         // Application.Resources is searched before the styles, so these theme dictionaries win over Soft.axaml's.

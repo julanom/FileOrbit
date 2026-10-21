@@ -173,7 +173,7 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
             (_front, _back, _backIds, _formats) = (Face.Empty, Face.Empty, [], []);
             ShowFace(false);
             Actions = Enum.GetValues<FileActionKind>()
-                .Where(action => action != FileActionKind.AirDrop || OperatingSystem.IsMacOS()).ToList();
+                .Where(action => OperatingSystem.IsMacOS() || action is not (FileActionKind.AirDrop or FileActionKind.Terminal)).ToList();
             Items = Actions.Select(action => new DonutItem
             {
                 Id = $"action-{action.ToString().ToLowerInvariant()}",
@@ -196,7 +196,7 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
         var ids = Menu == TriggerMenu.Tools
             ? ToolPresetIds.Where(id => store.FindPreset(id) is { } p && (p.IsGroup || availability.Check(p, formats) is null)).ToList()
             : profile?.PresetIds ?? [];
-        _front = BuildFace(ids.Take(12), formats);
+        _front = BuildFace(ids.Distinct(StringComparer.Ordinal).Take(12), formats);
         (_back, _backIds, _formats) = (null, Menu == TriggerMenu.Tools ? [.. ids.Skip(12)] : [.. profile?.BackPresetIds ?? []], formats);
         var load = ++_loads;
         if (backFace)
@@ -264,13 +264,14 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
     private Face BuildFace(IEnumerable<string> presetIds, IReadOnlyList<FileFormat> formats)
     {
         var presets = presetIds
+            .Distinct(StringComparer.Ordinal)
             .Select(store.FindPreset)
             .OfType<Preset>()
             .ToList();
 
         var subPresets = presets
             .Select(p => (IReadOnlyList<Preset>)(p.IsGroup ? p.SubPresetIds : [])
-                .Select(store.FindPreset).OfType<Preset>().Where(c => !c.IsGroup).Take(Preset.MaxSubPresets).ToList())
+                .Distinct(StringComparer.Ordinal).Select(store.FindPreset).OfType<Preset>().Where(c => !c.IsGroup).Take(Preset.MaxSubPresets).ToList())
             .ToList();
 
         DonutItem ItemOf(Preset p, bool caption = true)

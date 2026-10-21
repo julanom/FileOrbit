@@ -116,7 +116,7 @@ public class LocalizationResourceTests
         var toggle = new ToggleSwitch();
         var window = new Window { Content = new StackPanel { Children = { text, toggle } } };
         window.Show();
-        Assert.Equal("Home", text.Text);
+        Assert.Equal("A little less file work.", text.Text);
 
         TestServices.EnsureInitialized("ko");
         Assert.Equal("홈", text.Text);

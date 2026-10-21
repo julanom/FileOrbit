@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Filee.App"
              x:Class="Filee.App.App"
-             Name="Filee"
+             Name="FileOrbit"
              RequestedThemeVariant="Default">
 
   <Application.DataTemplates>
@@ -39,5 +39,6 @@
     <StyleInclude Source="avares://Filee/Styles/Soft.axaml" />
     <StyleInclude Source="avares://Filee/Styles/Controls.axaml" />
     <StyleInclude Source="avares://Filee/Styles/TagEditor.axaml" />
+    <StyleInclude Source="avares://Filee/Styles/Orbit.axaml" />
   </Application.Styles>
 </Application>

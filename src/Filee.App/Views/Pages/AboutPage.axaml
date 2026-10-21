@@ -30,43 +30,11 @@
         </StackPanel>
       </StackPanel>
     </Border>
-    <!-- Upstream sponsor UI is retained in source for attribution, but this fork does not solicit on its behalf. -->
-    <Border Classes="card" IsVisible="False">
-      <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="{DynamicResource sponsor.thanks}" />
-        <v:SupportersView x:Name="Supporters" ShowTitle="False" LogoHeight="40" />
-      </StackPanel>
-    </Border>
-    <Border Classes="card" IsVisible="False">
-      <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="{DynamicResource about.updates}" />
-        <ToggleSwitch Content="{DynamicResource general.check_updates}" IsChecked="{Binding CheckForUpdates}" />
-        <WrapPanel>
-          <Button Content="{DynamicResource general.check_now}" Command="{Binding CheckNowCommand}" Margin="0,0,10,0" />
-          <Button Classes="accent" Command="{Binding DownloadUpdateCommand}" IsVisible="{Binding UpdateAvailable}" Margin="0,0,10,0">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <PathIcon Width="13" Height="13" Data="{StaticResource Icon.Download}" />
-              <TextBlock Text="{Binding UpdateButtonText}" />
-            </StackPanel>
-          </Button>
-          <TextBlock Classes="muted" VerticalAlignment="Center" Text="{Binding UpdateStatus}" />
-        </WrapPanel>
-      </StackPanel>
-    </Border>
-    <Border Classes="card" IsVisible="False">
+    <Border Classes="card">
       <StackPanel Spacing="10">
-        <TextBlock Classes="h2" Text="{DynamicResource about.support_title}" />
-        <TextBlock Classes="muted" TextWrapping="Wrap" Text="{DynamicResource about.support_text}" />
-        <WrapPanel>
-          <Button Classes="accent" Click="OnStar" Margin="0,0,8,0" Content="{DynamicResource feedback.star}" />
-          <Button Click="OnIssue" Content="{DynamicResource feedback.issue}" Margin="0,0,8,0" />
-          <Button Click="OnSponsor">
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <PathIcon Width="13" Height="13" Data="{StaticResource Icon.Heart}" Foreground="#D4537E" />
-              <TextBlock Text="{DynamicResource about.sponsor}" />
-            </StackPanel>
-          </Button>
-        </WrapPanel>
+        <TextBlock Classes="h2" Text="{DynamicResource feedback.issue}" />
+        <TextBlock Classes="muted" TextWrapping="Wrap" Text="{DynamicResource app.tagline}" />
+        <Button Click="OnIssue" Content="{DynamicResource feedback.issue}" HorizontalAlignment="Left" />
       </StackPanel>
     </Border>
     <Border Classes="card">

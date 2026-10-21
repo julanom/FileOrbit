@@ -890,9 +890,7 @@ public class RenderTests
         main.Show();
         Pump();
         var about = main.GetVisualDescendants().OfType<Filee.App.Views.Pages.AboutPage>().Single();
-        about.Supporters.Show(new SupporterList(
-            [new Supporter("Acme", "https://acme.example", "acme.png"), new Supporter("Globex", "https://globex.example")],
-            [new("Kim"), new("Lee"), new("Park")]), _ => Logo());
+        Assert.Empty(about.GetVisualDescendants().OfType<SupportersView>());
         Pump();
         Save(main, "page-about-supporters-en.png");
         main.Close();

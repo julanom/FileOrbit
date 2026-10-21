@@ -13,8 +13,8 @@ namespace Filee.Platform.Windows;
 public sealed class WindowsPlatformServices : IPlatformServices
 {
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    private const string ContextMenuKey = @"Software\Classes\*\shell\Filee";
-    private const string AppName = "Filee";
+    private const string ContextMenuKey = @"Software\Classes\*\shell\FileOrbit";
+    private const string AppName = "FileOrbit";
 
     /// <summary>Window classes that belong to Explorer windows and the desktop.</summary>
     private static readonly HashSet<string> FileManagerClasses = new(StringComparer.Ordinal)
@@ -188,7 +188,7 @@ public sealed class WindowsPlatformServices : IPlatformServices
     /// </summary>
     public void SetContextMenu(bool enabled, string executablePath, string label)
     {
-        if (ExplorerMenuRegistration.IsSupportedOs)
+        if (ExplorerMenuRegistration.IsSupportedOs && !IsFileOrbit(executablePath))
             ExplorerMenuRegistration.SetTitle(enabled ? label : null);
 
         if (!enabled)
@@ -208,6 +208,9 @@ public sealed class WindowsPlatformServices : IPlatformServices
 
     public ModernContextMenuState GetModernContextMenuState(string executablePath)
     {
+        // The upstream sparse package has a different owner/CLSID. Never modify it from FileOrbit.
+        if (IsFileOrbit(executablePath))
+            return ModernContextMenuState.Unsupported;
         try
         {
             return Path.GetDirectoryName(executablePath) is { Length: > 0 } folder
@@ -224,6 +227,8 @@ public sealed class WindowsPlatformServices : IPlatformServices
 
     public Task<ModernContextMenuResult> SetModernContextMenuAsync(bool enabled, string executablePath) => Task.Run(async () =>
     {
+        if (IsFileOrbit(executablePath))
+            return new ModernContextMenuResult(false, Error: "FileOrbit uses the classic Explorer context menu in this preview.");
         var folder = Path.GetDirectoryName(executablePath);
         if (string.IsNullOrEmpty(folder))
             return new ModernContextMenuResult(false, Error: "Unknown install folder.");
@@ -275,6 +280,9 @@ public sealed class WindowsPlatformServices : IPlatformServices
     public void OpenFile(string path) =>
         Process.Start(new ProcessStartInfo(Path.GetFullPath(path)) { UseShellExecute = true })?.Dispose();
 
+    private static bool IsFileOrbit(string path) =>
+        string.Equals(Path.GetFileName(path), "FileOrbit.exe", StringComparison.OrdinalIgnoreCase);
+
     public bool SupportsOpenWith => true;
 
     /// <summary>
@@ -308,7 +316,7 @@ public sealed class WindowsPlatformServices : IPlatformServices
     }
 
     private static string SendToShortcutPath =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.SendTo), "Filee.lnk");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.SendTo), "FileOrbit.lnk");
 
     private static nint RootWindowAt(int x, int y)
     {

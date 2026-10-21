@@ -1,1 +1,14 @@
-<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><path transform='translate(0,-0)' fill='#7F77DD' d='M154.61 65.27 A216 216 0 0 1 357.39 65.27 L304.82 164.17 A104 104 0 0 0 207.18 164.17 Z'/><path transform='translate(13.86,-8)' fill='#1D9E75' d='M373.66 67.74 A222 222 0 0 1 477.86 248.23 L359.94 252.36 A104 104 0 0 0 311.12 167.81 Z'/><path transform='translate(0,0)' fill='#7F77DD' d='M471.87 263.56 A216 216 0 0 1 370.48 439.17 L311.12 344.19 A104 104 0 0 0 359.94 259.64 Z'/><path transform='translate(0,0)' fill='#6A62C9' d='M357.39 446.73 A216 216 0 0 1 154.61 446.73 L207.18 347.83 A104 104 0 0 0 304.82 347.83 Z'/><path transform='translate(-0,0)' fill='#7F77DD' d='M141.52 439.17 A216 216 0 0 1 40.13 263.56 L152.06 259.64 A104 104 0 0 0 200.88 344.19 Z'/><path transform='translate(-0,-0)' fill='#6A62C9' d='M40.13 248.44 A216 216 0 0 1 141.52 72.83 L200.88 167.81 A104 104 0 0 0 152.06 252.36 Z'/><path fill='#3C3489' d='M222 212 h44 l24 24 v64 h-68 z'/><path fill='#AFA9EC' d='M266 212 v24 h24 z'/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102B4B"/><stop offset="1" stop-color="#071421"/></linearGradient>
+    <linearGradient id="orbit" x2="1" y2="1"><stop stop-color="#A6F4ED"/><stop offset=".5" stop-color="#45C7ED"/><stop offset="1" stop-color="#4285F4"/></linearGradient>
+    <linearGradient id="file" x2="1" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#A5D5F5"/></linearGradient>
+  </defs>
+  <rect x="24" y="24" width="464" height="464" rx="110" fill="url(#bg)" stroke="#47718D" stroke-width="2"/>
+  <ellipse cx="256" cy="262" rx="181" ry="94" transform="rotate(-32 256 262)" fill="none" stroke="url(#orbit)" stroke-width="18"/>
+  <path d="M197 147 h79 l51 52 v149 a18 18 0 0 1 -18 18 h-112 a18 18 0 0 1 -18 -18 v-183 a18 18 0 0 1 18 -18z" fill="url(#file)" stroke="#FFFFFF" stroke-width="2"/>
+  <path d="M276 147 v35 a17 17 0 0 0 17 17 h34" fill="#67A9D6"/>
+  <path d="M212 248 h82 M212 276 h65 M212 304 h49" fill="none" stroke="#2B699A" stroke-width="12" stroke-linecap="round"/>
+  <path d="M105 333 C160 377 325 326 403 231" fill="none" stroke="url(#orbit)" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="397" cy="216" r="24" fill="#B8FFF1" stroke="#FFFFFF" stroke-width="4"/>
+</svg>

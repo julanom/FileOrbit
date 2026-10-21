@@ -41,7 +41,10 @@ public sealed class RadialMenuModeTests
         Assert.Contains(FileActionKind.Copy, viewModel.Actions);
         Assert.Contains(FileActionKind.Move, viewModel.Actions);
         Assert.Contains(FileActionKind.CopyPath, viewModel.Actions);
-        Assert.Contains(FileActionKind.Terminal, viewModel.Actions);
+        if (OperatingSystem.IsMacOS())
+            Assert.Contains(FileActionKind.Terminal, viewModel.Actions);
+        else
+            Assert.DoesNotContain(FileActionKind.Terminal, viewModel.Actions);
         Assert.Equal(viewModel.Actions.Count, viewModel.Items.Count);
     }
 

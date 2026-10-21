@@ -1,0 +1,52 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <LinearGradientBrush x:Key="OrbitBackdrop" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#DAE4F2FF" Offset="0" />
+            <GradientStop Color="#E8EFF4FA" Offset="0.55" />
+            <GradientStop Color="#DAD9F5EF" Offset="1" />
+          </LinearGradientBrush>
+          <SolidColorBrush x:Key="OrbitGlass" Color="#CFFFFFFF" />
+          <SolidColorBrush x:Key="OrbitEdge" Color="#EFFFFFFF" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <LinearGradientBrush x:Key="OrbitBackdrop" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#E0122035" Offset="0" />
+            <GradientStop Color="#EC101822" Offset="0.55" />
+            <GradientStop Color="#E0103036" Offset="1" />
+          </LinearGradientBrush>
+          <SolidColorBrush x:Key="OrbitGlass" Color="#D51B2737" />
+          <SolidColorBrush x:Key="OrbitEdge" Color="#24FFFFFF" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+  <Style Selector="Border.orbitGlass">
+    <Setter Property="Background" Value="{DynamicResource OrbitGlass}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource OrbitEdge}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="18" />
+    <Setter Property="BoxShadow" Value="0 8 28 0 #16000000" />
+  </Style>
+  <Style Selector="TextBlock.h1">
+    <Setter Property="FontSize" Value="28" />
+    <Setter Property="LetterSpacing" Value="-0.6" />
+  </Style>
+  <Style Selector="Border.card">
+    <Setter Property="BoxShadow" Value="0 3 12 0 #09000000" />
+    <Setter Property="Padding" Value="20,18" />
+  </Style>
+  <Style Selector="ListBox.nav ListBoxItem">
+    <Setter Property="Padding" Value="12,11" />
+    <Setter Property="Margin" Value="0,2" />
+    <Setter Property="CornerRadius" Value="10" />
+  </Style>
+  <Style Selector="ListBox.nav ListBoxItem:selected">
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+  <Style Selector="Button:pointerover, Button:pressed, ToggleButton:pointerover, ToggleButton:pressed">
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+</Styles>

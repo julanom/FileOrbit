@@ -37,6 +37,8 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+    <!-- Upstream promotional assets and release tours are not FileOrbit product content. -->
+    <AvaloniaResource Remove="Assets\Sponsors\**;Assets\WhatsNew\**" />
     <!-- Shown on the About page. -->
     <AvaloniaResource Include="..\..\THIRD-PARTY-NOTICES.md" Link="Assets\THIRD-PARTY-NOTICES.md" />
   </ItemGroup>

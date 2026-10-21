@@ -1,6 +1,7 @@
 # Third-party notices
 
-Filee is MIT-licensed. It uses and redistributes the following third-party software.
+FileOrbit is MIT-licensed and derives from Filee. The original copyright and
+permission notice is retained in LICENSE. FileOrbit uses and redistributes the following third-party software.
 Each component remains under its own license.
 
 ## Libraries (NuGet)

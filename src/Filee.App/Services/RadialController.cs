@@ -110,9 +110,11 @@ public sealed class RadialController(
     /// Supplies Finder's current selection to a still-active drag. macOS does not guarantee a DragEnter event for a
     /// window created underneath an already-running drag, so this lets the visible wheel show useful slices at once.
     /// </summary>
+    internal void NativeDragEntered() => _dragReachedDonut = true;
+
     public void SupplyDragFiles(int generation, IReadOnlyList<string> files)
     {
-        if (files.Count == 0 || generation != _dragGeneration || !_visible || _dropped || viewModel.IsClickMode)
+        if (files.Count == 0 || generation != _dragGeneration || !_visible || _dropped || _dragReachedDonut || viewModel.IsClickMode)
             return;
         if (SameFiles(files, viewModel.Files))
             return;
@@ -244,7 +246,7 @@ public sealed class RadialController(
         var window = new RadialWindow { DataContext = viewModel };
         var donut = window.DonutControl;
 
-        window.DragEntered += () => _dragReachedDonut = true;
+        window.DragEntered += NativeDragEntered;
         // Tells "the drag reached the donut but brought no files" apart, with what it brought (file promises, say).
         window.DragWithoutFiles += formats =>
         {

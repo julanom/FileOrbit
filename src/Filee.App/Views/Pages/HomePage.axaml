@@ -55,17 +55,17 @@
     </Border>
 
     <!-- Drop zone: files dropped here open the donut toolbar at the cursor. -->
-    <Border x:Name="DropZone" DragDrop.AllowDrop="True" MinHeight="220"
+    <Border x:Name="DropZone" DragDrop.AllowDrop="True" MinHeight="238"
             Background="{DynamicResource AccentFaintBrush}" BorderBrush="{DynamicResource AccentSoftBrush}"
-            BorderThickness="2" CornerRadius="{DynamicResource SoftRadiusLarge}" Padding="24">
-      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
-        <Border Width="64" Height="64" CornerRadius="999" Background="{DynamicResource AccentSoftBrush}" HorizontalAlignment="Center">
-          <PathIcon Width="28" Height="28" Data="{StaticResource Icon.Upload}" Foreground="{DynamicResource AccentStrongBrush}" />
-        </Border>
-        <TextBlock Classes="h2" HorizontalAlignment="Center" Text="{DynamicResource home.drop_title}" />
-        <TextBlock Classes="muted" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="460"
-                   Text="{Binding DropHint}" />
-      </StackPanel>
+            BorderThickness="1" CornerRadius="{DynamicResource SoftRadiusLarge}" Padding="30">
+      <Grid ColumnDefinitions="*,132">
+        <StackPanel VerticalAlignment="Center" Spacing="16" Margin="0,0,24,0">
+          <PathIcon Width="24" Height="24" HorizontalAlignment="Left" Data="{StaticResource Icon.Upload}" Foreground="{DynamicResource AccentBrush}" />
+          <TextBlock FontSize="25" FontWeight="SemiBold" TextWrapping="Wrap" Text="{DynamicResource home.drop_title}" />
+          <TextBlock Classes="muted" TextWrapping="Wrap" MaxWidth="460" HorizontalAlignment="Left" Text="{Binding DropHint}" />
+        </StackPanel>
+        <Image Grid.Column="1" Width="132" Height="132" Source="avares://Filee/Assets/Icons/filee.png" VerticalAlignment="Center" />
+      </Grid>
     </Border>
 
     <!-- Recent conversions -->

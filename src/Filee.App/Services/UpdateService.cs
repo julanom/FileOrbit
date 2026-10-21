@@ -61,14 +61,14 @@ public sealed partial class UpdateService : ObservableObject
         _log = log;
         // Downloads use their own stall timeout (StallTimeout); this one covers the API call and the response headers.
         _http = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(20) };
-        _http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Filee", CurrentVersion));
+        _http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("FileOrbit", CurrentVersion));
         _http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
     }
 
     /// <summary>GitHub repository from Directory.Build.props (FileeRepositoryUrl).</summary>
     public static string RepositoryUrl =>
         typeof(UpdateService).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
-            .FirstOrDefault(a => a.Key == "RepositoryUrl")?.Value ?? "https://github.com/KnifeLemon/Filee";
+            .FirstOrDefault(a => a.Key == "RepositoryUrl")?.Value ?? "https://github.com/julanom/FileOrbit";
 
     public static string CurrentVersion =>
         typeof(UpdateService).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0]
@@ -81,7 +81,7 @@ public sealed partial class UpdateService : ObservableObject
     public static string LatestReleaseUrl => RepositoryUrl.TrimEnd('/') + "/releases/latest";
 
     /// <summary>The website: one big download button, friendlier than the GitHub release page.</summary>
-    public const string WebsiteUrl = "https://filee.sh/";
+    public const string WebsiteUrl = "https://github.com/julanom/FileOrbit";
 
     /// <summary>
     /// True when this copy was installed by Setup, which puts its uninstaller next to Filee.exe (uninstall.exe; the

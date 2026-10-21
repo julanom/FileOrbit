@@ -7,7 +7,7 @@ namespace Filee.Platform.Linux;
 
 internal sealed class LinuxDesktopIntegration(string configHome, string dataHome)
 {
-    internal const string ThunarActionId = "filee-convert";
+    internal const string ThunarActionId = "fileorbit-convert";
     internal const string ThunarAcceleratorPath = "<Actions>/ThunarActions/uca-action-" + ThunarActionId;
 
     internal static string? ToThunarAccelerator(TriggerGesture gesture)
@@ -90,13 +90,13 @@ internal sealed class LinuxDesktopIntegration(string configHome, string dataHome
 
     public void SetAutostart(bool enabled, string executablePath)
     {
-        var path = Path.Combine(configHome, "autostart", "filee.desktop");
+        var path = Path.Combine(configHome, "autostart", "fileorbit.desktop");
         if (!enabled)
         {
             File.Delete(path);
             return;
         }
-        Write(path, $"[Desktop Entry]\nType=Application\nName=Filee\nExec={DesktopArgument(executablePath)} --background\nTerminal=false\nX-GNOME-Autostart-enabled=true\n");
+        Write(path, $"[Desktop Entry]\nType=Application\nName=FileOrbit\nExec={DesktopArgument(executablePath)} --background\nTerminal=false\nX-GNOME-Autostart-enabled=true\n");
     }
 
     public void SetContextMenu(bool enabled, string executablePath, string label)
@@ -104,10 +104,10 @@ internal sealed class LinuxDesktopIntegration(string configHome, string dataHome
         var thunarPath = Path.Combine(configHome, "Thunar", "uca.xml");
         var menuPaths = new[]
         {
-            Path.Combine(dataHome, "Thunar", "sendto", "filee.desktop"),
-            Path.Combine(dataHome, "nautilus", "scripts", "Filee"),
-            Path.Combine(dataHome, "nemo", "actions", "filee.nemo_action"),
-            Path.Combine(dataHome, "kio", "servicemenus", "filee.desktop"),
+            Path.Combine(dataHome, "Thunar", "sendto", "fileorbit.desktop"),
+            Path.Combine(dataHome, "nautilus", "scripts", "FileOrbit"),
+            Path.Combine(dataHome, "nemo", "actions", "fileorbit.nemo_action"),
+            Path.Combine(dataHome, "kio", "servicemenus", "fileorbit.desktop"),
         };
         var thunar = LoadThunarActions(thunarPath);
         UpdateThunarAction(thunar, enabled, executablePath, label);
