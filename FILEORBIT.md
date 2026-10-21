@@ -1,7 +1,7 @@
 # FileOrbit
 
-FileOrbit is a macOS-focused fork of [Filee](https://github.com/KnifeLemon/Filee) at upstream commit
-`a1be20cefad36ea9bfa1b3bb923e3199b78de992` (Filee 1.12.0 plus its Spanish localization). It keeps Filee's offline conversion engine and MIT license, and adds
+FileOrbit is a macOS-focused fork of [Filee](https://github.com/KnifeLemon/Filee) based on upstream
+tag `v2.0.0` (FileOrbit `2.0.0-fileorbit.9`). It keeps Filee's offline conversion engine and MIT license, and adds
 FileOrbit's three radial workflows and native file actions.
 
 ## What changed
@@ -25,7 +25,15 @@ FileOrbit's three radial workflows and native file actions.
 
 ## Build and run
 
-Requires macOS 14 or later and the .NET 10 SDK.
+The 2.0 update adds front/back wheels (Tab or scroll to flip), interactive image cropping, browser file dragging,
+Live/Motion Photos, additional formats, PDF merge ordering, history search and thumbnails, new languages and upstream
+security fixes. The Command tools wheel includes Crop. FileOrbit retains its native file actions, bundled rhwp and
+7-Zip, immediate modifier-tap wheel, and recreation of overlays on the active macOS Space.
+
+The Dock icon defaults to off to preserve the working full-screen overlay behavior. The new Dock setting can enable
+it, but joining other applications' full-screen Spaces should be checked when that preference is changed.
+
+Requires macOS 13 or later and the .NET 10 SDK.
 
 ```sh
 dotnet restore

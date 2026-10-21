@@ -93,6 +93,9 @@ public sealed partial class PresetEditorViewModel : ObservableObject
         WavFormats = Enum.GetValues<WavSampleFormat>().Select(v => new Choice<WavSampleFormat>(v, loc[$"presets.wav_format.{v}"])).ToList();
         ArchiveLevels = Enum.GetValues<ArchiveLevel>().Select(v => new Choice<ArchiveLevel>(v, loc[$"presets.archive_level.{v}"])).ToList();
         TraceModes = Enum.GetValues<TracingMode>().Select(v => new Choice<TracingMode>(v, loc[$"presets.trace_mode.{v}"])).ToList();
+        // A speed set outside the editor (a hand-edited preset file) is offered too, instead of being lost.
+        AnimationSpeeds = [.. ImageOptions.AnimationSpeeds.Append(_edit.Image.PlaybackSpeed).Distinct().Order()
+            .Select(s => new Choice<double>(s, s == 1 ? loc["presets.animation_speed.original"] : SpeedLabel(s)))];
 
         _name = string.IsNullOrWhiteSpace(_edit.Name) ? loc.DisplayName(_edit) : _edit.Name;
         _target = Targets.FirstOrDefault(t => t.Value == _edit.TargetFormat) ?? Targets[1];
@@ -118,8 +121,14 @@ public sealed partial class PresetEditorViewModel : ObservableObject
         _archiveLevel = ArchiveLevels.First(l => l.Value == _edit.Archive.Level);
         _combineIntoOne = _edit.Archive.CombineIntoOne;
         _saveEveryFrame = _edit.Media.SaveEveryFrame;
+        _extractMotionPhoto = _edit.Media.ExtractMotionPhoto;
+        _livePhotoValue = _edit.Media.LivePhoto;
+        _livePhotoStart = _edit.Media.LivePhotoStart;
+        _livePhotoLength = _edit.Media.LivePhotoLength;
+        _livePhotoCover = _edit.Media.LivePhotoCover;
         _frameInterval = _edit.Media.FrameInterval > 0 ? _edit.Media.FrameInterval : 1;
         _traceMode = TraceModes.First(m => m.Value == _edit.Trace.Mode);
+        _animationSpeed = AnimationSpeeds.First(s => s.Value == _edit.Image.PlaybackSpeed);
         _traceColors = Math.Clamp(_edit.Trace.Colors, TracingOptions.MinColors, TracingOptions.MaxColors);
         _traceDetail = Math.Clamp(_edit.Trace.Detail, 0, 100);
         _quality = _edit.Image.Quality;
@@ -147,13 +156,18 @@ public sealed partial class PresetEditorViewModel : ObservableObject
         _trimPageMargins = _edit.Pdf.TrimPageMargins;
         _splitTallImage = _edit.Pdf.SplitTallImage;
         _pdfA = _edit.Document.PdfA;
+        _leaveOutPictures = _edit.Document.LeaveOutPictures;
         _subfolderName = _edit.Output.SubfolderName;
+        _subfolderOnlyForSeveralFiles = _edit.Output.SubfolderOnlyForSeveralFiles;
         _customFolder = _edit.Output.CustomFolder;
         _pattern = _edit.Output.FileNamePattern;
         _keepDates = _edit.Output.KeepDates;
+        _zipResult = _edit.Output.ZipResult;
     }
 
     public string PresetId => _original.Id;
+    public bool IsTool => _original.IsTool;
+    public bool CanChangeTarget => !IsTool;
 
     public IReadOnlyList<Choice<string>> Targets { get; }
     public IReadOnlyList<Choice<ResizeMode>> ResizeModes { get; }
@@ -177,19 +191,80 @@ public sealed partial class PresetEditorViewModel : ObservableObject
     public IReadOnlyList<Choice<ArchiveLevel>> ArchiveLevels { get; }
     public IReadOnlyList<Choice<TracingMode>> TraceModes { get; }
 
+    /// <summary>Playback speeds of animations, 0.25× to 4× (ImageOptions.AnimationSpeed).</summary>
+    public IReadOnlyList<Choice<double>> AnimationSpeeds { get; }
+
     [ObservableProperty, NotifyPropertyChangedFor(nameof(NameError), nameof(IsValid))]
     private string _name;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowImage), nameof(ShowTurnForPdf), nameof(ShowQuality), nameof(ShowTiff), nameof(ShowMultiPageTiff), nameof(ShowWebp), nameof(ShowIco),
-        nameof(ShowPdf), nameof(ShowPdfBuild), nameof(ShowDocument), nameof(ShowPdfSplit), nameof(ShowPdfCombine),
+        nameof(ShowZipResult), nameof(ShowPdf), nameof(ShowPdfBuild), nameof(ShowDocument), nameof(ShowLeaveOutPictures), nameof(ShowPdfSplit), nameof(ShowPdfCombine),
         nameof(ShowPdfCompression), nameof(ShowPdfCompressionOptions),
         nameof(ShowMedia), nameof(ShowMediaQuality), nameof(ShowMaxHeight), nameof(ShowAudioBitrate), nameof(ShowRemoveAudio),
         nameof(ShowAudioChannels), nameof(ShowWav), nameof(VideoCodecs), nameof(VideoCodecChoice), nameof(ShowVideoCodec), nameof(ShowHardwareEncoding),
         nameof(AudioCodecs), nameof(AudioCodecChoice), nameof(ShowAudioCodec),
         nameof(ShowArchive), nameof(ShowArchiveOptions), nameof(ShowExtractNote),
-        nameof(ShowSaveEveryFrame), nameof(ShowTrace))]
+        nameof(ShowSaveEveryFrame), nameof(ShowAnimationSpeed), nameof(ShowTrace), nameof(ShowExtractMotionPhoto),
+        nameof(ShowLivePhotoChoice), nameof(LivePhotoKinds), nameof(LivePhotoChoice), nameof(IsLivePhoto), nameof(LivePhotoHint))]
     private Choice<string> _target;
+
+    private LivePhotoKind _livePhotoValue;
+
+    /// <summary>What a video becomes for a JPG or HEIC target: one still frame, or a Live / Motion Photo it can be written as.</summary>
+    public IReadOnlyList<Choice<LivePhotoKind>> LivePhotoKinds =>
+        [.. Enum.GetValues<LivePhotoKind>()
+            .Where(k => k == LivePhotoKind.None || MediaOptions.LivePhotoTargets(k).Contains(TargetId))
+            .Select(k => new Choice<LivePhotoKind>(k, _loc[$"presets.live_photo.{k}"]))];
+
+    /// <summary>The chosen kind; one the target can't be written as shows (and is saved) as None.</summary>
+    public Choice<LivePhotoKind> LivePhotoChoice
+    {
+        get => LivePhotoKinds.FirstOrDefault(c => c.Value == _livePhotoValue) ?? LivePhotoKinds[0];
+        set
+        {
+            // The combo box clears its selection while its list is replaced: announcing the value shows it again.
+            if (value is null)
+            {
+                OnPropertyChanged();
+                return;
+            }
+            if (value.Value == _livePhotoValue)
+                return;
+            _livePhotoValue = value.Value;
+            OnPropertyChanged();
+            foreach (var name in (string[])[nameof(IsLivePhoto), nameof(LivePhotoHint), nameof(ShowImage), nameof(ShowPdf), nameof(ShowSaveEveryFrame)])
+                OnPropertyChanged(name);
+        }
+    }
+
+    [ObservableProperty] private double _livePhotoStart;
+    [ObservableProperty] private double _livePhotoLength;
+    [ObservableProperty] private double _livePhotoCover;
+
+    /// <summary>The clip's video codec: H.264, or HEVC for smaller files (MediaOptions.VideoCodec).</summary>
+    public IReadOnlyList<Choice<VideoCodec>> LivePhotoCodecs =>
+    [
+        new(VideoCodec.Default, _loc["presets.video_codec.h264"]),
+        new(VideoCodec.Hevc, _loc["presets.video_codec.hevc"]),
+    ];
+
+    public Choice<VideoCodec> LivePhotoCodecChoice
+    {
+        get => LivePhotoCodecs.FirstOrDefault(c => c.Value == _videoCodecValue) ?? LivePhotoCodecs[0];
+        set
+        {
+            if (value is null)
+            {
+                OnPropertyChanged();
+                return;
+            }
+            if (value.Value == _videoCodecValue)
+                return;
+            _videoCodecValue = value.Value;
+            OnPropertyChanged();
+        }
+    }
 
     private VideoCodec _videoCodecValue;
     private AudioCodec _audioCodecValue;
@@ -315,10 +390,17 @@ public sealed partial class PresetEditorViewModel : ObservableObject
     [ObservableProperty] private bool _trimPageMargins;
     [ObservableProperty] private bool _splitTallImage;
     [ObservableProperty] private bool _pdfA;
+
+    /// <summary>Markdown: the text only, no picture folder next to it (DocumentOptions.LeaveOutPictures).</summary>
+    [ObservableProperty] private bool _leaveOutPictures;
     [ObservableProperty] private string _subfolderName;
+    /// <summary>The subfolder only for a file that becomes several (OutputRule.SubfolderOnlyForSeveralFiles).</summary>
+    [ObservableProperty] private bool _subfolderOnlyForSeveralFiles;
     [ObservableProperty] private string _customFolder;
     [ObservableProperty] private string _pattern;
     [ObservableProperty] private bool _keepDates;
+    /// <summary>Geospatial targets: the result is saved as one ZIP (OutputRule.ZipResult).</summary>
+    [ObservableProperty] private bool _zipResult;
     [ObservableProperty] private Choice<MediaQuality> _mediaQuality;
     [ObservableProperty] private Choice<int> _maxHeight;
     [ObservableProperty] private Choice<int> _audioBitrate;
@@ -327,11 +409,12 @@ public sealed partial class PresetEditorViewModel : ObservableObject
     [ObservableProperty] private Choice<WavSampleFormat> _wavFormat;
     [ObservableProperty] private bool _removeAudio;
 
-    /// <summary>Encode H.264 / HEVC on the graphics chip when one works (MediaOptions.HardwareEncoding).</summary>
+    /// <summary>Encode H.264 / HEVC / AV1 on the graphics chip when one works (MediaOptions.HardwareEncoding).</summary>
     [ObservableProperty] private bool _hardwareEncoding;
     [ObservableProperty] private Choice<ArchiveLevel> _archiveLevel;
     [ObservableProperty] private bool _combineIntoOne;
     [ObservableProperty] private bool _saveEveryFrame;
+    [ObservableProperty] private bool _extractMotionPhoto;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(FrameEstimate))]
     private int _frameInterval = 1;
@@ -345,6 +428,7 @@ public sealed partial class PresetEditorViewModel : ObservableObject
 
     [ObservableProperty] private int _traceColors;
     [ObservableProperty] private int _traceDetail;
+    [ObservableProperty] private Choice<double> _animationSpeed;
 
     // A combo box that loses its selection sets null: every choice keeps its value (see Choices.Restore).
     partial void OnTargetChanged(Choice<string>? oldValue, Choice<string> newValue) => Choices.Restore(oldValue, newValue, v => Target = v);
@@ -366,6 +450,8 @@ public sealed partial class PresetEditorViewModel : ObservableObject
     partial void OnTraceModeChanged(Choice<TracingMode>? oldValue, Choice<TracingMode> newValue) => Choices.Restore(oldValue, newValue, v => TraceMode = v);
     partial void OnCompressionLevelChanged(Choice<PdfCompression>? oldValue, Choice<PdfCompression> newValue) =>
         Choices.Restore(oldValue, newValue, v => CompressionLevel = v);
+    partial void OnAnimationSpeedChanged(Choice<double>? oldValue, Choice<double> newValue) =>
+        Choices.Restore(oldValue, newValue, v => AnimationSpeed = v);
 
     private string TargetId => Target.Value;
     private FormatCategory? TargetCategory => FormatRegistry.FindById(TargetId)?.Category;
@@ -375,19 +461,29 @@ public sealed partial class PresetEditorViewModel : ObservableObject
     private bool TargetIsLossyMedia => TargetIsVideo
         || (TargetIsAudio && !LosslessAudioTargets.Contains(TargetId) && MediaCodecs.Effective(TargetId, _audioCodecValue) != AudioCodec.Alac);
 
-    public bool ShowImage => TargetIsImage;
+    /// <summary>A tool (Crop) keeps the source as it is: none of the image options apply.</summary>
+    public bool ShowImage => !IsTool && TargetIsImage && !IsLivePhoto;
+    /// <summary>JPG and HEIC: a video can become a Live / Motion Photo instead of one still frame.</summary>
+    public bool ShowLivePhotoChoice => !IsTool && LivePhotoKinds.Count > 1;
+    /// <summary>A Live / Motion Photo is chosen and the target can be written as it: its clip options are shown.</summary>
+    public bool IsLivePhoto => ShowLivePhotoChoice && _livePhotoValue != LivePhotoKind.None
+        && MediaOptions.LivePhotoTargets(_livePhotoValue).Contains(TargetId);
+    /// <summary>What the chosen kind writes and where it is expected to work.</summary>
+    public string LivePhotoHint => _loc[_livePhotoValue == LivePhotoKind.Android ? "presets.live_photo_hint.android" : "presets.live_photo_hint.apple"];
     /// <summary>Images and PDFs (pictures placed on pages) can be turned and flipped.</summary>
     private bool CanTurn => TargetIsImage || TargetId == "pdf";
     /// <summary>Rotate and flip for a PDF target, which has no image card to show them in.</summary>
     public bool ShowTurnForPdf => TargetId == "pdf";
-    public bool ShowQuality => TargetId == BuiltInData.SameAsSource || LossyTargets.Contains(TargetId);
+    public bool ShowQuality => !IsTool && (TargetId == BuiltInData.SameAsSource || LossyTargets.Contains(TargetId));
     public bool ShowTiff => TargetId is "tiff" or BuiltInData.SameAsSource;
     public bool ShowWebp => TargetId is "webp" or BuiltInData.SameAsSource;
     public bool ShowMultiPageTiff => TargetId is "tiff";
     public bool ShowIco => TargetId == "ico";
-    /// <summary>PDF options (also used when a PDF source becomes images) mean nothing for media, archive, font, subtitle, data, e-mail and 3D targets.</summary>
-    public bool ShowPdf => TargetCategory is not (FormatCategory.Video or FormatCategory.Audio or FormatCategory.Archive or FormatCategory.Font
-        or FormatCategory.Subtitle or FormatCategory.Data or FormatCategory.Model3D) && TargetId != "eml";
+    /// <summary>PDF options (also used when a PDF source becomes images) mean nothing for media, archive, font, subtitle, data, e-mail, 3D and geospatial targets.</summary>
+    public bool ShowPdf => !IsTool && !IsLivePhoto && TargetCategory is not (FormatCategory.Video or FormatCategory.Audio or FormatCategory.Archive or FormatCategory.Font
+        or FormatCategory.Subtitle or FormatCategory.Data or FormatCategory.Model3D or FormatCategory.Geo) && TargetId != "eml";
+    /// <summary>"Save as ZIP" is offered for geospatial targets, whose results are several files (a Shapefile) or travel zipped.</summary>
+    public bool ShowZipResult => TargetCategory == FormatCategory.Geo;
     public bool ShowPdfBuild => TargetId == "pdf";
     public bool ShowPdfSplit => TargetId == "pdf";
 
@@ -399,6 +495,8 @@ public sealed partial class PresetEditorViewModel : ObservableObject
     public bool ShowPdfCombine => TargetCategory == FormatCategory.Image
         && TargetId is not ("tiff" or "gif" or "apng" or "mng" or "ico" or "cur" or "icns" or "svg" or "pdf");
     public bool ShowDocument => TargetId == "pdf";
+    /// <summary>Markdown can't hold pictures: they go into a folder next to it, or are left out.</summary>
+    public bool ShowLeaveOutPictures => TargetId == "md";
     public bool ShowMedia => ShowMediaQuality || ShowMaxHeight || ShowRemoveAudio || ShowAudioChannels || ShowVideoCodec || ShowAudioCodec;
     /// <summary>Mono / stereo for every audio target but AMR, which is mono by definition.</summary>
     public bool ShowAudioChannels => TargetIsAudio && TargetId != "amr";
@@ -406,7 +504,7 @@ public sealed partial class PresetEditorViewModel : ObservableObject
     public bool ShowWav => TargetId is "wav" or "w64";
     /// <summary>MP4, MKV, MOV and WebM can be written with HEVC or AV1 besides their usual codec.</summary>
     public bool ShowVideoCodec => TargetIsVideo && VideoCodecs.Count > 1;
-    /// <summary>Hardware encoding applies to H.264 and HEVC only (not VP9, AV1, MPEG-2, …).</summary>
+    /// <summary>Hardware encoding applies to H.264, HEVC and AV1 only (not VP9, MPEG-2, …).</summary>
     public bool ShowHardwareEncoding => TargetIsVideo && MediaCodecs.TakesHardwareEncoding(TargetId, _videoCodecValue);
     /// <summary>M4A / M4B can hold Apple Lossless besides AAC.</summary>
     public bool ShowAudioCodec => AudioCodecs.Count > 1;
@@ -419,7 +517,14 @@ public sealed partial class PresetEditorViewModel : ObservableObject
     /// <summary>"Extract" has nothing to set; a line says what it does instead.</summary>
     public bool ShowExtractNote => TargetId == FormatRegistry.Folder;
     /// <summary>"Save every frame" of a video: PNG and JPG (format ids, <see cref="MediaOptions.FrameTargets"/>).</summary>
-    public bool ShowSaveEveryFrame => MediaOptions.FrameTargets.Contains(TargetId);
+    public bool ShowSaveEveryFrame => !IsTool && !IsLivePhoto && MediaOptions.FrameTargets.Contains(TargetId);
+    /// <summary>The video of a Live / Motion Photo: MP4 and MOV (<see cref="MediaOptions.MotionPhotoTargets"/>).</summary>
+    public bool ShowExtractMotionPhoto => !IsTool && MediaOptions.MotionPhotoTargets.Contains(TargetId);
+    /// <summary>
+    /// Playback speed: for the formats an animation stays animated in (an animated GIF, WebP, APNG or MNG, or a video
+    /// made into a GIF or APNG). Other targets get one frame.
+    /// </summary>
+    public bool ShowAnimationSpeed => TargetId is "gif" or "webp" or "apng" or "mng" or BuiltInData.SameAsSource;
     /// <summary>
     /// Tracing options: raster images reach SVG (and DXF / DWG through it) only by tracing. For other sources (a
     /// drawing, a CAD file) the options are ignored.
@@ -475,6 +580,8 @@ public sealed partial class PresetEditorViewModel : ObservableObject
             .ToList();
         if (image.IcoSizes.Count == 0)
             image.IcoSizes = [256, 48, 32, 16];
+        // Only where the option is shown: a speed chosen for GIF and left behind by a JPG target saves nothing.
+        image.AnimationSpeed = ShowAnimationSpeed ? AnimationSpeed.Value : 1;
 
         var pdf = _original.Pdf;
         pdf.MergeIntoSingle = Merge;
@@ -489,6 +596,8 @@ public sealed partial class PresetEditorViewModel : ObservableObject
         pdf.Compression = CompressionLevel.Value;
         pdf.CompressWithGhostscript = CompressWithGhostscript;
         _original.Document.PdfA = PdfA;
+        // Only where the option is shown, as with SaveEveryFrame below.
+        _original.Document.LeaveOutPictures = ShowLeaveOutPictures && LeaveOutPictures;
 
         var media = _original.Media;
         media.Quality = MediaQuality.Value;
@@ -498,12 +607,22 @@ public sealed partial class PresetEditorViewModel : ObservableObject
         media.AudioChannels = AudioChannels.Value;
         media.AudioSampleRate = SampleRate.Value;
         media.WavFormat = WavFormat.Value;
-        media.VideoCodec = MediaCodecs.Effective(TargetId, _videoCodecValue);
+        // A Live Photo's clip is a MOV (or an MP4 in a Motion Photo): H.264 or HEVC, whatever the photo's format.
+        media.VideoCodec = IsLivePhoto
+            ? (_videoCodecValue == VideoCodec.Hevc ? VideoCodec.Hevc : VideoCodec.Default)
+            : MediaCodecs.Effective(TargetId, _videoCodecValue);
         media.AudioCodec = MediaCodecs.Effective(TargetId, _audioCodecValue);
         media.HardwareEncoding = HardwareEncoding;
         // Only where the option is shown: a box ticked for PNG and left behind by another target saves nothing.
         media.SaveEveryFrame = ShowSaveEveryFrame && SaveEveryFrame;
         media.FrameInterval = media.SaveEveryFrame ? Math.Clamp(FrameInterval, 1, 1000) : 1;
+        media.ExtractMotionPhoto = ShowExtractMotionPhoto && ExtractMotionPhoto;
+        media.LivePhoto = IsLivePhoto ? _livePhotoValue : LivePhotoKind.None;
+        static double Seconds(double value, double fallback, double min, double max) =>
+            double.IsFinite(value) ? Math.Clamp(value, min, max) : fallback;
+        media.LivePhotoStart = Seconds(LivePhotoStart, 0, 0, 24 * 3600);
+        media.LivePhotoLength = Seconds(LivePhotoLength, 3, MediaOptions.MinLivePhotoLength, MediaOptions.MaxLivePhotoLength);
+        media.LivePhotoCover = Seconds(LivePhotoCover, 1.5, 0, MediaOptions.MaxLivePhotoLength);
         _original.Archive.Level = ArchiveLevel.Value;
         _original.Archive.CombineIntoOne = CombineIntoOne;
         _original.Trace.Mode = TraceMode.Value;
@@ -513,12 +632,19 @@ public sealed partial class PresetEditorViewModel : ObservableObject
         var output = _original.Output;
         output.Location = Location.Value;
         output.SubfolderName = string.IsNullOrWhiteSpace(SubfolderName) ? "converted" : SubfolderName.Trim();
+        // Only with a subfolder, where it is offered: a box ticked there must not stay on hidden behind another location.
+        output.SubfolderOnlyForSeveralFiles = ShowSubfolder && SubfolderOnlyForSeveralFiles;
         output.CustomFolder = CustomFolder.Trim();
         output.FileNamePattern = string.IsNullOrWhiteSpace(Pattern) ? "{name}" : Pattern.Trim();
         output.Conflict = Conflict.Value;
         output.KeepDates = KeepDates;
+        // Only for geospatial targets, where it is offered: a box ticked for Shapefile must not zip a later PNG.
+        output.ZipResult = ShowZipResult && ZipResult;
         return true;
     }
+
+    /// <summary>"0.25×", "1.5×", "2×": the same in every language.</summary>
+    private static string SpeedLabel(double speed) => speed.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "×";
 
     /// <summary>Fixed choices plus the preset's own value if it isn't one of them (e.g. edited by hand).</summary>
     private static List<Choice<int>> Steps(int[] steps, int current, Func<int, string> label) =>

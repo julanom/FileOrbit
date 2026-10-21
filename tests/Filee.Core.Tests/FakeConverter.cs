@@ -16,6 +16,12 @@ internal sealed class FakeConverter(string id, params ConversionEdge[] edges) : 
 
     public bool Throw { get; set; }
 
+    /// <summary>Also writes a "_files" picture folder beside the output (Markdown), not counted as an output.</summary>
+    public bool PictureFolder { get; set; }
+
+    /// <summary>The picture folder is taken from the allocator (MarkdownPictures) rather than just written (Pandoc).</summary>
+    public bool ReservesPictureFolder { get; set; } = true;
+
     /// <summary>Thrown instead of converting, when set.</summary>
     public Exception? Failure { get; set; }
 
@@ -36,6 +42,14 @@ internal sealed class FakeConverter(string id, params ConversionEdge[] edges) : 
                 continue;
             File.WriteAllText(path, $"{Path.GetFileName(step.InputPath)}→{step.To} by {id}");
             written.Add(path);
+            if (PictureFolder)
+            {
+                var folder = ReservesPictureFolder
+                    ? step.Output.Allocate("", "_files")!
+                    : Path.Combine(Path.GetDirectoryName(path)!, Path.GetFileNameWithoutExtension(path) + "_files");
+                Directory.CreateDirectory(folder);
+                File.WriteAllText(Path.Combine(folder, "img0001.png"), "picture");
+            }
         }
         progress?.Report(1);
         return Task.FromResult<IReadOnlyList<string>>(written);
@@ -81,6 +95,9 @@ internal sealed class FakeRecorder(string id, params ConversionEdge[] edges) : I
     /// <summary>The steps it was asked for: (from, to, every frame).</summary>
     public List<(string From, string To, bool FrameSequence)> Steps { get; } = [];
 
+    /// <summary>The animation speed each step was asked for: (to, speed).</summary>
+    public List<(string To, double Speed)> Speeds { get; } = [];
+
     public EngineStatus GetStatus() => EngineStatus.Available();
 
     public Task<IReadOnlyList<string>> ConvertAsync(ConversionStep step, IProgress<double>? progress, CancellationToken cancellationToken)
@@ -89,6 +106,7 @@ internal sealed class FakeRecorder(string id, params ConversionEdge[] edges) : I
         {
             Asked.Add((step.To, step.Preset.Image.Rotation));
             Steps.Add((step.From, step.To, step.FrameSequence));
+            Speeds.Add((step.To, step.Preset.Image.AnimationSpeed));
         }
         return _writer.ConvertAsync(step, progress, cancellationToken);
     }

@@ -7,6 +7,7 @@ using Filee.Engines.Data;
 using Filee.Engines.Ebooks;
 using Filee.Engines.Email;
 using Filee.Engines.Fonts;
+using Filee.Engines.Geo;
 using Filee.Engines.Hwp;
 using Filee.Engines.Hwp.Hwpx;
 using Filee.Engines.Icns;
@@ -19,6 +20,7 @@ using Filee.Engines.Pdf;
 using Filee.Engines.Subtitles;
 using Filee.Engines.Text;
 using Filee.Engines.Vector;
+using Filee.Engines.Wic;
 using Microsoft.Extensions.Logging;
 
 namespace Filee.Engines;
@@ -31,7 +33,10 @@ public static class EngineRegistry
     /// AppSettings.EnginePriority: built-in engines first, the optional downloads last. Software installed on the
     /// system (Microsoft Office, a system-wide LibreOffice) is never used.
     /// </summary>
-    /// <param name="loggers">The app's log; FFmpeg writes which hardware encoders work and when one failed.</param>
+    /// <param name="loggers">
+    /// The app's log; FFmpeg writes which hardware encoders work and when one failed, LibreOffice when a file needed
+    /// its container repacked.
+    /// </param>
     public static IReadOnlyList<IConverter> CreateAll(EngineEnvironment env, ILoggerFactory? loggers = null) =>
     [
         new MagickImageConverter(),
@@ -53,14 +58,16 @@ public static class EngineRegistry
         new EmlConverter(),
         new DataConverter(),
         new SubtitleConverter(),
+        new WicImageConverter(),
         new FfmpegConverter(loggers?.CreateLogger<FfmpegConverter>()),
         new CadConverter(),
         new ModelConverter(),
+        new GeoConverter(),
         new EbookConverter(),
         new PandocConverter(),
         new GhostscriptConverter(),
         new CalibreConverter(),
-        new LibreOfficeConverter(env),
+        new LibreOfficeConverter(env, loggers?.CreateLogger<LibreOfficeConverter>()),
     ];
 
     /// <summary>Finds the PDF merger among the converters.</summary>

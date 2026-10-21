@@ -1,8 +1,12 @@
-// Verifies that retrying gestures waits for the previous native hook to release its shared callback.
+// Verifies that retrying gestures waits for the previous native hook to release its shared callback, that
+// Wayland's relative mouse motion still starts a drag gesture, and that Tab is reported (to flip the drag donut) only
+// while asked for.
 
 using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
 using Filee.App.Services.Triggers;
 using Filee.Core.Platform;
+using Filee.Core.Settings;
 using Microsoft.Extensions.Logging.Abstractions;
 using SharpHook;
 using SharpHook.Data;
@@ -82,8 +86,142 @@ public sealed class TriggerServiceLifecycleTests
         }
     }
 
-    private static TriggerService Create(DelayedProvider provider, Action key) =>
-        new(new NullPlatformServicesForHooks(), NullLogger<TriggerService>.Instance, () =>
+    private const EventMask Held = EventMask.LeftCtrl | EventMask.Button1;
+
+    [AvaloniaFact]
+    public void Wayland_relative_motion_adds_to_the_cursor_estimate_that_presses_start_from()
+    {
+        // Wayland reports presses at (0, 0) and a mouse only moves relatively; LastCursor must not take the estimate.
+        var (provider, service, started) = StartGesture(wayland: true);
+
+        provider.PostMouse(EventType.MouseMovedRelative, 500, 400, EventMask.None); // estimate before the press
+        provider.PostMouse(EventType.MousePressed, 0, 0, Held);
+        provider.PostMouse(EventType.MouseDraggedRelative, 3, 0, Held); // under the drag threshold
+        provider.PostMouse(EventType.MouseDraggedRelative, 3, 1, Held); // 6 from the press: over it
+
+        var e = WaitForStart(started);
+        Assert.Equal((506, 401), (e.X, e.Y));
+        Assert.Equal((0, 0), service.LastCursor);
+    }
+
+    [AvaloniaFact]
+    public void Wayland_absolute_pointer_moves_set_the_estimate()
+    {
+        // Tablets and virtual machines still send absolute moves, while their presses arrive at (0, 0).
+        var (provider, service, started) = StartGesture(wayland: true);
+
+        provider.PostMouse(EventType.MouseMoved, 100, 200, EventMask.None);
+        provider.PostMouse(EventType.MousePressed, 0, 0, Held);
+        provider.PostMouse(EventType.MouseDragged, 101, 200, Held); // 1 from the press: must not start
+        provider.PostMouse(EventType.MouseDragged, 110, 200, Held);
+
+        var e = WaitForStart(started);
+        Assert.Equal((110, 200), (e.X, e.Y));
+        Assert.Equal((110, 200), service.LastCursor);
+    }
+
+    [AvaloniaFact]
+    public void Off_Wayland_presses_and_the_cursor_keep_their_coordinates()
+    {
+        var (provider, service, started) = StartGesture(wayland: false);
+
+        provider.PostMouse(EventType.MousePressed, 50, 60, Held);
+        provider.PostMouse(EventType.MouseDragged, 60, 60, Held);
+
+        var e = WaitForStart(started);
+        Assert.Equal((60, 60), (e.X, e.Y));
+        Assert.Equal((60, 60), service.LastCursor);
+    }
+
+    [AvaloniaFact]
+    public void Tab_is_reported_only_while_watched_and_once_per_press()
+    {
+        var provider = new DelayedProvider();
+        provider.AllowExit.Set();
+        using var service = Create(provider, () => { });
+        var flips = 0;
+        service.FlipKeyPressed += (_, _) => flips++;
+        service.Start();
+        Assert.True(SpinWait.SpinUntil(() => provider.Runs == 1, 2000));
+
+        // The donut is closed: Tab is none of Filee's business.
+        provider.PostKey(EventType.KeyPressed, KeyCode.VcTab);
+        provider.PostKey(EventType.KeyReleased, KeyCode.VcTab);
+        Assert.Equal(0, Settle(() => flips));
+
+        service.WatchFlipKey = true;
+        provider.PostKey(EventType.KeyPressed, KeyCode.VcTab, EventMask.LeftCtrl); // the drag's modifier still held
+        Assert.Equal(1, Settle(() => flips));
+        provider.PostKey(EventType.KeyPressed, KeyCode.VcTab); // the key repeating while held: no second flip
+        provider.PostKey(EventType.KeyPressed, KeyCode.VcA);
+        Assert.Equal(1, Settle(() => flips));
+        provider.PostKey(EventType.KeyReleased, KeyCode.VcTab);
+        provider.PostKey(EventType.KeyPressed, KeyCode.VcTab);
+        Assert.Equal(2, Settle(() => flips));
+
+        service.WatchFlipKey = false;
+        provider.PostKey(EventType.KeyReleased, KeyCode.VcTab);
+        provider.PostKey(EventType.KeyPressed, KeyCode.VcTab);
+        Assert.Equal(2, Settle(() => flips));
+    }
+
+    /// <summary>Runs the work the hook posted to the UI thread for a moment, then reads the value.</summary>
+    [AvaloniaFact]
+    public void A_drag_over_a_web_browser_counts_as_over_the_file_manager()
+    {
+        var platform = new NullPlatformServicesForHooks { FileManager = false, Process = "msedge" };
+        using var service = new TriggerService(platform, NullLogger<TriggerService>.Instance);
+        var drag = new TriggerGesture { Kind = TriggerKind.Drag, Scope = TriggerScope.FileManager };
+        Assert.True(service.InScope(drag, 10, 10));
+        // Click and key gestures read the file manager's selection, which a browser doesn't have.
+        Assert.False(service.InScope(new TriggerGesture { Kind = TriggerKind.Hold, Scope = TriggerScope.FileManager }, 10, 10));
+        Assert.False(service.InScope(new TriggerGesture { Kind = TriggerKind.KeyChord, Scope = TriggerScope.FileManager }, 10, 10));
+        foreach (var browser in new[] { "chrome", "firefox", "Safari", "Google Chrome", "whale.exe" })
+        {
+            platform.Process = browser;
+            Assert.True(service.InScope(drag, 10, 10), browser);
+        }
+        platform.Process = "notepad";
+        Assert.False(service.InScope(drag, 10, 10));
+        // An excluded browser stays excluded.
+        platform.Process = "msedge";
+        var settings = new AppSettings { ExcludedProcesses = ["msedge.exe"] };
+        service.Apply(settings);
+        Assert.False(service.InScope(drag, 10, 10));
+    }
+
+    internal static T Settle<T>(Func<T> read)
+    {
+        for (var i = 0; i < 20; i++)
+        {
+            Thread.Sleep(10);
+            Dispatcher.UIThread.RunJobs();
+        }
+        return read();
+    }
+
+    private static (DelayedProvider Provider, TriggerService Service, Func<GestureEventArgs?> Started) StartGesture(bool wayland)
+    {
+        var provider = new DelayedProvider();
+        provider.AllowExit.Set();
+        var service = Create(provider, () => { }, wayland);
+        // Ctrl + left drag on every OS: the default drag gesture uses Option on macOS, which these presses don't hold.
+        service.Apply(new AppSettings { Triggers = [new TriggerGesture { Modifiers = ModifierKeys.Ctrl }] });
+        GestureEventArgs? started = null;
+        service.DragStarted += (_, e) => started = e;
+        service.Start();
+        Assert.True(SpinWait.SpinUntil(() => provider.Runs == 1, 2000));
+        return (provider, service, () => started);
+    }
+
+    private static GestureEventArgs WaitForStart(Func<GestureEventArgs?> started)
+    {
+        Assert.True(SpinWait.SpinUntil(() => { Dispatcher.UIThread.RunJobs(); return started() is not null; }, 2000));
+        return started()!;
+    }
+
+    internal static TriggerService Create(DelayedProvider provider, Action key, bool wayland = false) =>
+        new(new NullPlatformServicesForHooks { PressCarriesPosition = !wayland }, NullLogger<TriggerService>.Instance, () =>
         {
             var hook = new EventLoopGlobalHook(provider, useBackgroundThreadForEventLoop: true);
             hook.KeyPressed += (_, _) => key();
@@ -91,7 +229,7 @@ public sealed class TriggerServiceLifecycleTests
         });
 
     // Models libuiohook's process-wide callback and asynchronous native shutdown. No OS input is hooked.
-    private sealed class DelayedProvider : IGlobalHookProvider
+    internal sealed class DelayedProvider : IGlobalHookProvider
     {
         private readonly object _gate = new();
         private DispatchProc? _callback;
@@ -124,6 +262,42 @@ public sealed class TriggerServiceLifecycleTests
             StopRequested.Set();
             return UioHookResult.Success;
         }
+        public void PostMouse(EventType type, short x, short y, EventMask mask)
+        {
+            lock (_gate)
+            {
+                var e = new UioHookEvent
+                {
+                    Type = type,
+                    Mask = mask,
+                    Mouse = new MouseEventData { Button = MouseButton.Button1, X = x, Y = y },
+                };
+                _callback?.Invoke(ref e, _data);
+            }
+        }
+
+        public void PostKey(EventType type, KeyCode code, EventMask mask = EventMask.None)
+        {
+            lock (_gate)
+            {
+                var e = new UioHookEvent { Type = type, Mask = mask, Keyboard = new KeyboardEventData { KeyCode = code } };
+                _callback?.Invoke(ref e, _data);
+            }
+        }
+
+        public void PostWheel(short rotation, MouseWheelScrollDirection direction = MouseWheelScrollDirection.Vertical)
+        {
+            lock (_gate)
+            {
+                var e = new UioHookEvent
+                {
+                    Type = EventType.MouseWheel,
+                    Wheel = new MouseWheelEventData { Rotation = rotation, Delta = 1, Direction = direction },
+                };
+                _callback?.Invoke(ref e, _data);
+            }
+        }
+
         public void PressKey()
         {
             lock (_gate)
@@ -134,10 +308,13 @@ public sealed class TriggerServiceLifecycleTests
         }
     }
 
-    private sealed class NullPlatformServicesForHooks : IPlatformServices
+    internal sealed class NullPlatformServicesForHooks : IPlatformServices
     {
-        public bool IsFileManagerAt(int x, int y) => true;
-        public string? ProcessNameAt(int x, int y) => "explorer";
+        public bool PressCarriesPosition { get; init; } = true;
+        public bool FileManager { get; set; } = true;
+        public string? Process { get; set; } = "explorer";
+        public bool IsFileManagerAt(int x, int y) => FileManager;
+        public string? ProcessNameAt(int x, int y) => Process;
         public IReadOnlyList<string> GetFileManagerSelection() => [];
         public int SystemDragThreshold => 4;
         public bool PrefersReducedMotion => false;
@@ -146,6 +323,7 @@ public sealed class TriggerServiceLifecycleTests
         public ModernContextMenuState GetModernContextMenuState(string executablePath) => ModernContextMenuState.Unsupported;
         public Task<ModernContextMenuResult> SetModernContextMenuAsync(bool enabled, string executablePath) => Task.FromResult(new ModernContextMenuResult(false));
         public void RevealInFileManager(string path) { }
+        public void OpenFile(string path) { }
         public void RaiseTopmost(nint windowHandle) { }
     }
 }

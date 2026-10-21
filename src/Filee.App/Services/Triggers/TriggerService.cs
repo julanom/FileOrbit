@@ -6,6 +6,7 @@ using System.Diagnostics;
 using Avalonia.Threading;
 using Filee.Core.Platform;
 using Filee.Core.Settings;
+using Filee.Core.Web;
 using Microsoft.Extensions.Logging;
 using SharpHook;
 using SharpHook.Data;
@@ -57,6 +58,53 @@ public sealed class TriggerService : IDisposable
     /// <summary>A hold or keyboard gesture: open the donut for the file manager's current selection.</summary>
     public event EventHandler<GestureEventArgs>? SelectionGesture;
 
+    /// <summary>The flip key went down while <see cref="WatchFlipKey"/> was on: flip the donut.</summary>
+    public event EventHandler? FlipKeyPressed;
+
+    /// <summary>The mouse wheel turned (up or down) while <see cref="WatchFlipKey"/> was on: flip the donut.</summary>
+    public event EventHandler? FlipWheelTurned;
+
+    private volatile bool _watchFlipKey;
+    private volatile string? _flipKey = DonutSettings.DefaultFlipKey;
+    private volatile bool _flipWheel = true;
+    private bool _flipKeyDown; // hook thread only
+
+    /// <summary>
+    /// On while the drag-mode donut shows files: the flip key (Tab unless set otherwise) and the mouse wheel are
+    /// reported (<see cref="FlipKeyPressed"/>, once per press, not for the repeats of a held key;
+    /// <see cref="FlipWheelTurned"/>). During an OS drag the donut's window has no keyboard focus, so they reach Filee
+    /// only through the hook. Nothing is swallowed: the hook only listens (it runs on its own thread and can't hold an
+    /// event back), Explorer and Finder ignore Tab during a drag, and with the donut closed neither is looked at.
+    /// </summary>
+    public bool WatchFlipKey
+    {
+        get => _watchFlipKey;
+        set => _watchFlipKey = value;
+    }
+
+    /// <summary>The flip key went down or up (hook thread).</summary>
+    private void OnFlipKey(bool down)
+    {
+        var repeat = down && _flipKeyDown;
+        _flipKeyDown = down;
+        if (down && !repeat && _watchFlipKey)
+            Post(() => FlipKeyPressed?.Invoke(this, EventArgs.Empty));
+    }
+
+    /// <summary>A key went down or up (hook thread): the flip key's state is followed whether or not it is watched.</summary>
+    private void OnKey(KeyCode code, bool down)
+    {
+        if (_flipKey is { } flip && string.Equals(KeyName(code), flip, StringComparison.OrdinalIgnoreCase))
+            OnFlipKey(down);
+    }
+
+    /// <summary>The wheel turned (hook thread). Each notch is reported: the donut keeps one flip per turn.</summary>
+    private void OnWheel(MouseWheelEventData wheel)
+    {
+        if (_watchFlipKey && _flipWheel && wheel.Direction == MouseWheelScrollDirection.Vertical && wheel.Rotation != 0)
+            Post(() => FlipWheelTurned?.Invoke(this, EventArgs.Empty));
+    }
+
     /// <summary>Last known cursor position (physical pixels).</summary>
     public (int X, int Y) LastCursor { get; private set; }
 
@@ -77,6 +125,8 @@ public sealed class TriggerService : IDisposable
     {
         _detector.Configure(settings.Triggers.Where(g => _platform.SupportsSelectionShortcut || g.Kind == TriggerKind.Drag).ToList());
         _detector.Paused = settings.Paused;
+        _flipKey = settings.Donut.EffectiveFlipKey(settings.Triggers);
+        _flipWheel = settings.Donut.FlipWithWheel;
         _excluded = new HashSet<string>(settings.ExcludedProcesses.Select(p => p.Trim().Replace(".exe", "", StringComparison.OrdinalIgnoreCase)),
             StringComparer.OrdinalIgnoreCase);
     }
@@ -113,19 +163,26 @@ public sealed class TriggerService : IDisposable
             {
                 if (Trace)
                     _log.LogInformation("Trace: press {Button} at {X},{Y}, mask {Mask} = {Modifiers}", e.Data.Button, e.Data.X, e.Data.Y, e.RawEvent.Mask, Map(e.RawEvent.Mask));
-                _detector.MouseDown(Map(e.Data.Button), e.Data.X, e.Data.Y, Map(e.RawEvent.Mask));
+                var (x, y) = ButtonPoint(e);
+                _detector.MouseDown(Map(e.Data.Button), x, y, Map(e.RawEvent.Mask));
             };
-            _hook.MouseReleased += (_, e) => _detector.MouseUp(Map(e.Data.Button), e.Data.X, e.Data.Y);
+            _hook.MouseReleased += (_, e) =>
+            {
+                var (x, y) = ButtonPoint(e);
+                _detector.MouseUp(Map(e.Data.Button), x, y);
+            };
             _hook.MouseDragged += (_, e) => OnMove(e);
             _hook.MouseMoved += (_, e) => OnMove(e);
+            _hook.MouseDraggedRelative += (_, e) => OnRelativeMove(e);
+            _hook.MouseMovedRelative += (_, e) => OnRelativeMove(e);
             _hook.KeyPressed += (_, e) =>
             {
+                OnKey(e.Data.KeyCode, down: true);
                 var key = KeyName(e.Data.KeyCode);
-                // Some macOS event taps report the flags as they were immediately before a modifier-key event.
-                // Include the key being pressed so tapping Shift/Command/Control can trigger a live Finder drag
-                // without requiring a later mouse move.
                 _detector.KeyDown(key, Map(e.RawEvent.Mask) | ModifierForKey(key));
             };
+            _hook.KeyReleased += (_, e) => OnKey(e.Data.KeyCode, down: false);
+            _hook.MouseWheel += (_, e) => OnWheel(e.Data);
             // Own the actual Run thread. SharpHook's RunAsync task completes BEFORE its finally
             // clears the native callback, so awaiting that task alone is not a safe restart barrier.
             var hook = _hook;
@@ -171,20 +228,42 @@ public sealed class TriggerService : IDisposable
     internal static bool IsMissingLinuxBackend(Exception exception) =>
         exception is HookException { Result: UioHookResult.ErrorLinuxLoadBackend };
 
+    // Wayland (experimental): presses carry no position and a mouse only moves relatively, while tablets and virtual
+    // machines still send absolute moves. So a running estimate is kept: absolute moves set it, relative moves add to
+    // it, and presses start from it. It is only good for the drag threshold and drifts over a long hover. Placing the
+    // donut at the real cursor is a KWin script's job (installer/linux/kwin), and LastCursor is left alone because
+    // the estimate is not a screen position.
+    private int _estX, _estY;
+
+    private (int X, int Y) ButtonPoint(MouseHookEventArgs e) =>
+        _platform.PressCarriesPosition ? (e.Data.X, e.Data.Y) : (_estX, _estY);
+
     private void OnMove(MouseHookEventArgs e)
     {
+        (_estX, _estY) = (e.Data.X, e.Data.Y);
         LastCursor = (e.Data.X, e.Data.Y);
         _detector.MouseMove(e.Data.X, e.Data.Y, Map(e.RawEvent.Mask), HeldButton(e.RawEvent.Mask));
     }
 
-    private bool InScope(TriggerGesture gesture, int x, int y)
+    private void OnRelativeMove(MouseHookEventArgs e)
+    {
+        _estX += e.Data.X;
+        _estY += e.Data.Y;
+        if (Trace && HeldButton(e.RawEvent.Mask) != TriggerMouseButton.None)
+            _log.LogInformation("Trace: relative move {Dx},{Dy} -> {X},{Y}, mask {Mask}", e.Data.X, e.Data.Y, _estX, _estY, e.RawEvent.Mask);
+        _detector.MouseMove(_estX, _estY, Map(e.RawEvent.Mask), HeldButton(e.RawEvent.Mask));
+    }
+
+    internal bool InScope(TriggerGesture gesture, int x, int y)
     {
         var process = _platform.ProcessNameAt(x, y);
         if (Trace)
             _log.LogInformation("Trace: {Gesture} at {X},{Y} over {Process}", gesture.Kind, x, y, process ?? "(none)");
         if (process is not null && (string.Equals(process, _ownProcess, StringComparison.OrdinalIgnoreCase) || _excluded.Contains(process)))
             return false;
-        return gesture.Scope == TriggerScope.Anywhere || _platform.IsFileManagerAt(x, y);
+        return gesture.Scope == TriggerScope.Anywhere || _platform.IsFileManagerAt(x, y)
+               // A picture or link dragged out of a web page opens the donut like a file.
+               || gesture.Kind == TriggerKind.Drag && WebBrowsers.IsBrowser(process);
     }
 
     private static void Post(Action action) => Dispatcher.UIThread.Post(action);

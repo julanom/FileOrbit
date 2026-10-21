@@ -46,6 +46,8 @@ internal static class TestServices
         }
 
         var store = AppHost.Get<UserDataStore>();
+        // Each test starts in the conversion wheel, independent of a previous action/tools test.
+        AppHost.Get<Filee.App.ViewModels.RadialViewModel>().ResetForDrag();
         store.Settings.Language = language;
         AppHost.Get<LocalizationService>().SetLanguage(language);
         AppHost.Get<ThemeService>().Apply(store.Settings.Theme, language);

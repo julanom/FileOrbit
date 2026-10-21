@@ -8,6 +8,26 @@ namespace Filee.App.Tests;
 public sealed class RadialMenuModeTests
 {
     [AvaloniaFact]
+    public void Conversion_back_face_and_actions_remain_independent()
+    {
+        TestServices.EnsureInitialized("en");
+        var vm = AppHost.Get<RadialViewModel>();
+        vm.Load(["/tmp/photo.jpg"], true, TriggerMenu.Convert);
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        Assert.True(vm.ToggleFace());
+        Assert.Contains(vm.Items, item => item.Id == "tool-crop");
+        vm.Load(["/tmp/photo.jpg"], true, TriggerMenu.Actions);
+        Assert.False(vm.CanFlip);
+        Assert.False(vm.ToggleFace());
+        Assert.Null(vm.PresetAt(0, -1));
+        Assert.NotNull(vm.ActionAt(0));
+        vm.Load(["/tmp/photo.jpg"], true, TriggerMenu.Tools);
+        Assert.Contains(vm.Items, item => item.Id == "tool-crop");
+        Assert.Empty(vm.Actions);
+        vm.Load(["/tmp/photo.jpg"], true, TriggerMenu.Convert);
+    }
+
+    [AvaloniaFact]
     public void Actions_wheel_exposes_real_actions_instead_of_conversion_presets()
     {
         TestServices.EnsureInitialized("en");
