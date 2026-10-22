@@ -1,11 +1,10 @@
 // Real file-management actions used by FileOrbit's Actions wheel.
 
 using System.Diagnostics;
-using System.Text;
-using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
+using FileOrbit.Platform.MacOS;
 
 namespace FileOrbit.App.Services;
 
@@ -21,8 +20,6 @@ public enum FileActionKind
 
 public sealed class FileActionService(ShelfService shelf)
 {
-    internal const string AirDropServiceName = "com.apple.share.AirDrop.send";
-
     private const string TerminalScript = """
         on run argv
           tell application "Terminal"
@@ -34,25 +31,6 @@ public sealed class FileActionService(ShelfService shelf)
         end run
         """;
 
-    private const string AirDropScript = """
-        ObjC.import('AppKit');
-        ObjC.import('Foundation');
-        function run(argv) {
-          const app = $.NSApplication.sharedApplication;
-          app.activateIgnoringOtherApps(true);
-          const error = Ref();
-          const text = $.NSString.stringWithContentsOfFileEncodingError(argv[0], $.NSUTF8StringEncoding, error).js;
-          const paths = JSON.parse(text);
-          const urls = paths.map(path => $.NSURL.fileURLWithPath(path));
-          const service = $.NSSharingService.sharingServiceNamed('com.apple.share.AirDrop.send');
-          if (!service) throw new Error('AirDrop is unavailable on this Mac.');
-          service.performWithItems(urls);
-          // The sharing sheet is asynchronous. Give AppKit a run loop after launching it; an osascript process that
-          // exits immediately can dismiss the AirDrop chooser before Finder has presented it.
-          $.NSRunLoop.currentRunLoop.runUntilDate($.NSDate.dateWithTimeIntervalSinceNow(3));
-        }
-        """;
-
     public async Task ExecuteAsync(FileActionKind action, IReadOnlyList<string> paths, Window owner)
     {
         var existing = paths.Where(path => File.Exists(path) || Directory.Exists(path)).Distinct().ToArray();
@@ -62,7 +40,9 @@ public sealed class FileActionService(ShelfService shelf)
         switch (action)
         {
             case FileActionKind.AirDrop:
-                await Task.Run(() => AirDrop(existing));
+                if (!OperatingSystem.IsMacOS())
+                    throw new PlatformNotSupportedException("AirDrop is only available on macOS.");
+                AirDrop.Send(existing);
                 break;
             case FileActionKind.Shelf:
                 shelf.Add(existing);
@@ -205,24 +185,6 @@ public sealed class FileActionService(ShelfService shelf)
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or FileNotFoundException)
         {
             // Best-effort cleanup of data created by this operation only.
-        }
-    }
-
-    private static void AirDrop(IReadOnlyList<string> paths)
-    {
-        if (!OperatingSystem.IsMacOS())
-            throw new PlatformNotSupportedException("AirDrop is only available on macOS.");
-
-        var manifest = Path.Combine(Path.GetTempPath(), $"fileorbit-airdrop-{Guid.NewGuid():N}.json");
-        try
-        {
-            File.WriteAllText(manifest, JsonSerializer.Serialize(paths), new UTF8Encoding(false));
-            Run("/usr/bin/osascript", ["-l", "JavaScript", "-e", AirDropScript, manifest]);
-        }
-        finally
-        {
-            try { File.Delete(manifest); }
-            catch (IOException) { }
         }
     }
 

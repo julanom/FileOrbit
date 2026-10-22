@@ -52,4 +52,16 @@ public sealed class MacOSNativeTests
         _ = platform.ProcessNameAt(0, 0);
         Assert.Equal(4, platform.SystemDragThreshold);
     }
+
+    [Fact]
+    public void NativeAirDropServiceIsAvailableOnMacOS()
+    {
+        if (!OperatingSystem.IsMacOS())
+        {
+            Assert.Skip("Requires macOS frameworks.");
+            return;
+        }
+
+        Assert.True(AirDrop.IsAvailable);
+    }
 }

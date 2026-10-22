@@ -5,12 +5,6 @@ namespace FileOrbit.App.Tests;
 public sealed class FileActionServiceTests
 {
     [Fact]
-    public void AirDrop_uses_the_native_send_service()
-    {
-        Assert.Equal("com.apple.share.AirDrop.send", FileActionService.AirDropServiceName);
-    }
-
-    [Fact]
     public void Terminal_uses_the_containing_folder_for_files_and_the_folder_itself_for_folders()
     {
         using var temp = new ActionTempDirectory();
