@@ -24,6 +24,7 @@ public sealed partial class NavItem(string key, string titleKey, string iconKey,
     [ObservableProperty] private string _title = "";
 
     public void Refresh(ILocalizer loc) => Title = loc[TitleKey];
+    public override string ToString() => Title;
 }
 
 /// <summary>

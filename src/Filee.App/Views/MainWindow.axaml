@@ -17,7 +17,7 @@
             <Button x:Name="UpdateButton" Classes="accent" HorizontalAlignment="Stretch"
                     Command="{Binding DownloadUpdateCommand}" IsVisible="{Binding Updates.IsUpdateAvailable}"
                     Content="{Binding UpdateText}" ToolTip.Tip="{Binding UpdateTip}" />
-            <Button Classes="navlink" HorizontalAlignment="Stretch" Click="OnOpenGitHub" ToolTip.Tip="{Binding RepositoryUrl}">
+            <Button Classes="navlink" AutomationProperties.Name="GitHub" HorizontalAlignment="Stretch" Click="OnOpenGitHub" ToolTip.Tip="{Binding RepositoryUrl}">
               <StackPanel Orientation="Horizontal" Spacing="10">
                 <PathIcon Width="15" Height="15" Data="{StaticResource Icon.GitHub}" />
                 <TextBlock Text="GitHub" />

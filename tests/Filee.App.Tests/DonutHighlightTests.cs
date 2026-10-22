@@ -29,10 +29,14 @@ public class DonutHighlightTests
         Set(donut, "_lastTick", Environment.TickCount64 - DonutMenu.StalledLoopMs * 4);
 
         donut.SetExternalHighlight(2);
+        Assert.True(Environment.TickCount64 - (long)typeof(DonutMenu)
+            .GetField("_lastTick", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(donut)! < DonutMenu.StalledLoopMs);
         for (var i = 0; i < 90 && donut.LitAmount(2) < 0.9; i++)
         {
             AvaloniaHeadlessPlatform.ForceRenderTimerTick();
             Dispatcher.UIThread.RunJobs();
+            // Headless frames can arrive with identical timestamps; step simulated time explicitly.
+            donut.Advance(1 / 60.0);
         }
 
         Assert.True(donut.LitAmount(2) > 0.9, $"lit {donut.LitAmount(2):0.00}");

@@ -36,7 +36,7 @@ public class SupportersTests
     }
 
     [Fact]
-    public void Every_listed_supporter_is_in_every_readme_and_has_its_logo()
+    public void FileOrbit_readmes_do_not_solicit_upstream_donations()
     {
         var folder = Path.Combine(RepoRoot, "src", "Filee.App", "Assets", "Sponsors");
         var list = Supporters.Parse(File.ReadAllText(Path.Combine(folder, "sponsors.json")));
@@ -44,8 +44,8 @@ public class SupportersTests
         foreach (var readme in new[] { "README.md", "README.ko.md", "README.zh-CN.md", "README.pt-BR.md" })
         {
             var text = File.ReadAllText(Path.Combine(RepoRoot, readme));
-            Assert.Contains("<!-- sponsors: src/Filee.App/Assets/Sponsors/sponsors.json -->", text);
-            Assert.All(list.Sponsors.Concat(list.Backers), s => Assert.Contains(s.Name, text));
+            Assert.DoesNotContain("github.com/sponsors/KnifeLemon", text);
+            Assert.DoesNotContain("paypal.me/knifelemon", text);
         }
         Assert.All(list.Sponsors.SelectMany(s => new[] { s.Logo, s.LogoDark }).OfType<string>(),
             logo => Assert.True(File.Exists(Path.Combine(folder, logo)), logo));

@@ -34,10 +34,10 @@ public class WhatsNewTests
     // ───────────────────────── Manifests ─────────────────────────
 
     [AvaloniaFact]
-    public void The_2_0_0_deck_ships_with_its_media_and_texts()
+    public void The_legacy_fixture_deck_has_its_media_and_texts()
     {
         TestServices.EnsureInitialized("en");
-        var decks = SlideDeck.LoadAll("Filee");
+        var decks = SlideDeck.LoadAll("Filee.App.Tests");
         var deck = Assert.Single(decks, d => d.Version == V2);
         Assert.InRange(deck.Slides.Count, 5, 7);
         Assert.Equal(deck.Slides.Count, deck.Slides.Select(s => s.Id).Distinct().Count());
@@ -45,7 +45,7 @@ public class WhatsNewTests
         foreach (var slide in deck.Slides)
         {
             Assert.True(AssetLoader.Exists(slide.Media), $"{slide.Media} is missing");
-            Assert.StartsWith("avares://Filee/Assets/WhatsNew/2.0.0/", slide.Media.ToString(), StringComparison.Ordinal);
+            Assert.StartsWith("avares://Filee.App.Tests/Assets/WhatsNew/2.0.0/", slide.Media.ToString(), StringComparison.Ordinal);
             Assert.Contains(slide.TitleKey, english.Keys);
             Assert.Contains(slide.TextKey, english.Keys);
         }
@@ -160,43 +160,15 @@ public class WhatsNewTests
     }
 
     [AvaloniaFact]
-    public void Starting_in_the_background_waits_for_the_main_window()
+    public void FileOrbit_does_not_open_upstream_promotional_slides()
     {
         TestServices.EnsureInitialized("en");
-        var (service, store, windows) = (AppHost.Get<WhatsNewService>(), AppHost.Get<UserDataStore>(), AppHost.Get<WindowService>());
-        var (seen, firstRun, version) = (store.Settings.WhatsNewSeenVersion, store.Settings.FirstRunCompleted, service.CurrentVersion);
-        try
-        {
-            service.CurrentVersion = V2;
-            store.Settings.FirstRunCompleted = true;
-            store.Settings.WhatsNewSeenVersion = null;
-
-            service.CheckAtStartup(background: true);
-            Pump();
-            Assert.Equal(V2, service.Pending?.Version);
-            Assert.Null(windows.WhatsNew);
-            Assert.Null(store.Settings.WhatsNewSeenVersion); // not seen yet: a quit now shows them next time
-
-            windows.ShowMain(); // the user opens Filee from the tray
-            Pump();
-            var window = Assert.IsType<WhatsNewWindow>(windows.WhatsNew);
-            Assert.True(window.IsVisible);
-            Assert.Null(service.Pending);
-            Assert.Equal("2.0.0", store.Settings.WhatsNewSeenVersion);
-            window.Close();
-
-            // Shown once: the next start has nothing to show.
-            service.CheckAtStartup(background: false);
-            Pump();
-            Assert.Null(service.Pending);
-            Assert.Null(windows.WhatsNew);
-        }
-        finally
-        {
-            windows.WhatsNew?.Close();
-            windows.Main?.Close();
-            (store.Settings.WhatsNewSeenVersion, store.Settings.FirstRunCompleted, service.CurrentVersion) = (seen, firstRun, version);
-        }
+        var service = AppHost.Get<WhatsNewService>();
+        Assert.Empty(service.Decks);
+        Assert.Null(service.Latest);
+        service.CheckAtStartup(background: true);
+        Assert.Null(service.Pending);
+        Assert.Null(AppHost.Get<WindowService>().WhatsNew);
     }
 
     [AvaloniaFact]
@@ -250,7 +222,7 @@ public class WhatsNewTests
     {
         TestServices.EnsureInitialized(language);
         beforeOpening?.Invoke();
-        var deck = SlideDeck.LoadAll("Filee").Single(d => d.Version == V2);
+        var deck = SlideDeck.LoadAll("Filee.App.Tests").Single(d => d.Version == V2);
         var window = new WhatsNewWindow(deck, AppHost.Get<ILocalizer>());
         window.Show();
         window.Activate();
@@ -429,42 +401,15 @@ public class WhatsNewTests
     }
 
     [AvaloniaFact]
-    public void About_offers_the_slides_again()
+    public void About_does_not_offer_upstream_promotional_slides()
     {
         TestServices.EnsureInitialized("en");
         var service = AppHost.Get<WhatsNewService>();
-        var store = AppHost.Get<UserDataStore>();
-        var (version, seen) = (service.CurrentVersion, store.Settings.WhatsNewSeenVersion);
-        try
-        {
-            service.CurrentVersion = new Version(2, 0, 3);
-            var vm = new MainWindowViewModel(AppHost.Services, AppHost.Get<ILocalizer>(), AppHost.Get<UpdateService>());
-            vm.Navigate("about");
-            var window = new MainWindow { DataContext = vm, Width = 1080, Height = 820 };
-            window.Show();
-            Pump();
-            var about = (AboutPageViewModel)vm.CurrentPage!;
-            Assert.Equal(AppHost.Get<ILocalizer>().Format("whats_new.about_link", "2.0"), about.WhatsNewText);
-            var link = Named(window, "WhatsNewLink");
-            Assert.True(link.IsEffectivelyVisible);
-            Save(window, "page-about-whats-new-en.png");
-
-            link.Command!.Execute(null);
-            Pump();
-            Assert.IsType<WhatsNewWindow>(AppHost.Get<WindowService>().WhatsNew);
-            Assert.Equal("2.0.3", store.Settings.WhatsNewSeenVersion);
-            AppHost.Get<WindowService>().WhatsNew!.Close();
-            window.Close();
-
-            // A version older than every deck has nothing to offer.
-            service.CurrentVersion = new Version(1, 12, 0);
-            using var older = new AboutPageViewModel(AppHost.Get<ILocalizer>(), store, AppHost.Get<UpdateService>(), service);
-            Assert.False(older.HasWhatsNew);
-        }
-        finally
-        {
-            (service.CurrentVersion, store.Settings.WhatsNewSeenVersion) = (version, seen);
-        }
+        Assert.Empty(service.Decks);
+        Assert.Null(service.Latest);
+        service.CheckAtStartup(background: true);
+        Assert.Null(service.Pending);
+        Assert.Null(AppHost.Get<WindowService>().WhatsNew);
     }
 
     // ───────────────────────── Screenshots ─────────────────────────

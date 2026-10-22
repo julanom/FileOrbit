@@ -18,5 +18,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <!-- Legacy tour media remain test fixtures, not FileOrbit product assets. -->
+    <AvaloniaResource Include="../../src/Filee.App/Assets/WhatsNew/**" Link="Assets/WhatsNew/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>
