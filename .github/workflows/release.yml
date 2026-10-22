@@ -25,7 +25,7 @@ jobs:
         with:
           global-json-file: global.json
       - name: Core tests
-        run: dotnet test tests/Filee.Core.Tests -c Release -m:1
+        run: dotnet test tests/FileOrbit.Core.Tests -c Release -m:1
       - name: macOS package
         if: runner.os == 'macOS'
         run: sh build/build-fileorbit-macos.sh Releases

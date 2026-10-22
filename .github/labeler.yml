@@ -14,4 +14,4 @@ documentation:
 translation:
   - changed-files:
       - all-globs-to-all-files:
-          - src/Filee.App/Assets/i18n/**
+          - src/FileOrbit.App/Assets/i18n/**

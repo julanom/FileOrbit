@@ -14,6 +14,6 @@ jobs:
       - uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
-      - run: dotnet build src/Filee.App -c Release -m:1
-      - run: dotnet test tests/Filee.Core.Tests -c Release -m:1
-      - run: dotnet test tests/Filee.App.Tests -c Release -m:1 --filter "FullyQualifiedName~FileOrbitTests|FullyQualifiedName~Radial|FullyQualifiedName~DonutFlip|FullyQualifiedName~Localization|FullyQualifiedName~SponsorTests"
+      - run: dotnet build src/FileOrbit.App -c Release -m:1
+      - run: dotnet test tests/FileOrbit.Core.Tests -c Release -m:1
+      - run: dotnet test tests/FileOrbit.App.Tests -c Release -m:1 --filter "FullyQualifiedName~FileOrbitTests|FullyQualifiedName~Radial|FullyQualifiedName~DonutFlip|FullyQualifiedName~Localization|FullyQualifiedName~SponsorTests"

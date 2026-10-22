@@ -10,9 +10,9 @@
 
 ## Screenshots (UI changes)
 
-<!-- Rendered pages are in tests/Filee.App.Tests/bin/<config>/net10.0/screenshots -->
+<!-- Rendered pages are in tests/FileOrbit.App.Tests/bin/<config>/net10.0/screenshots -->
 
 ## Checklist
 
-- [ ] New UI strings are in all `src/Filee.App/Assets/i18n/*.json` files
+- [ ] New UI strings are in all `src/FileOrbit.App/Assets/i18n/*.json` files
 - [ ] New third-party code or binaries are listed in `THIRD-PARTY-NOTICES.md`
