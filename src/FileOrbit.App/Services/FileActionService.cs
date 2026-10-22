@@ -21,6 +21,8 @@ public enum FileActionKind
 
 public sealed class FileActionService(ShelfService shelf)
 {
+    internal const string AirDropServiceName = "com.apple.share.AirDrop.send";
+
     private const string TerminalScript = """
         on run argv
           tell application "Terminal"
@@ -36,13 +38,18 @@ public sealed class FileActionService(ShelfService shelf)
         ObjC.import('AppKit');
         ObjC.import('Foundation');
         function run(argv) {
+          const app = $.NSApplication.sharedApplication;
+          app.activateIgnoringOtherApps(true);
           const error = Ref();
           const text = $.NSString.stringWithContentsOfFileEncodingError(argv[0], $.NSUTF8StringEncoding, error).js;
           const paths = JSON.parse(text);
           const urls = paths.map(path => $.NSURL.fileURLWithPath(path));
-          const service = $.NSSharingService.sharingServiceNamed('com.apple.share.AirDrop');
+          const service = $.NSSharingService.sharingServiceNamed('com.apple.share.AirDrop.send');
           if (!service) throw new Error('AirDrop is unavailable on this Mac.');
           service.performWithItems(urls);
+          // The sharing sheet is asynchronous. Give AppKit a run loop after launching it; an osascript process that
+          // exits immediately can dismiss the AirDrop chooser before Finder has presented it.
+          $.NSRunLoop.currentRunLoop.runUntilDate($.NSDate.dateWithTimeIntervalSinceNow(3));
         }
         """;
 
