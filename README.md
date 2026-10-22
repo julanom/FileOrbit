@@ -46,8 +46,8 @@ Windows uses the classic Explorer menu (under “Show more options” on Windows
 Install the .NET 10 SDK.
 
 ```sh
-dotnet build src/Filee.App -c Release
-dotnet run --project src/Filee.App
+dotnet build src/FileOrbit.App -c Release
+dotnet run --project src/FileOrbit.App
 ```
 
 macOS: `sh build/build-fileorbit-macos.sh Releases`
@@ -56,7 +56,8 @@ Windows PowerShell: `./build/build-fileorbit-windows.ps1`
 
 Linux PowerShell: `./build/build-portable.ps1 -Runtime linux-x64 -SkipFonts`
 
-The package workflow builds on each target OS. Tags publish a preview only after all package jobs pass. Internal assembly and namespace names retain compatibility with the conversion engine; the public application identity is FileOrbit.
+The package workflow builds on each target OS. Tags publish a preview only after all package jobs pass. Assemblies,
+namespaces, executables, package identifiers, and application data paths use the FileOrbit identity.
 
 ## Verification and limitations
 
@@ -64,4 +65,5 @@ Focused regression tests cover native-drag precedence, duplicate wheel entries, 
 
 ## License and acknowledgments
 
-MIT. FileOrbit derives from Filee; the original copyright and permission notice remains in [LICENSE](LICENSE), with dependency licenses in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Product branding and support links are FileOrbit's; this is not an upstream release.
+MIT. The original copyright and permission notice remains in [LICENSE](LICENSE), with required attribution and
+dependency licenses in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). FileOrbit is an independent project.

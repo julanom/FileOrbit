@@ -1,16 +1,16 @@
 # Changelog
 
-What changed in each version of Filee, for the people using it. The release workflow puts the section of the
+What changed in each version of FileOrbit, for the people using it. The release workflow puts the section of the
 version it publishes under "What's Changed" in the GitHub release notes, above the list of pull requests.
 
-Add a `## <version>` section before tagging a release. Write what someone using Filee notices: what's new, where to
+Add a `## <version>` section before tagging a release. Write what someone using FileOrbit notices: what's new, where to
 find it, what it does and doesn't do.
 
 Start the section with an `<!-- update -->` block (hidden on GitHub). The app's update notice shows its level and its
-one-line summaries in the user's language (any language Filee ships: `ko`, `en`, `zh`, `pl`, `pt-BR`, …; a line per
+one-line summaries in the user's language (any language FileOrbit ships: `ko`, `en`, `zh`, `pl`, `pt-BR`, …; a line per
 change, a language may repeat; a language without lines shows the English ones):
 
-- `required`: wrong or lost results, security, Filee not starting. The card shows every time Filee starts.
+- `required`: wrong or lost results, security, FileOrbit not starting. The card shows every time FileOrbit starts.
 - `recommended`: bug fixes. The card shows once per version.
 - `optional`: new features only. No card, the sidebar button only.
 
@@ -18,7 +18,7 @@ change, a language may repeat; a language without lines shows the English ones):
 
 <!-- update
 level: recommended
-ko: Filee 전용 Windows 설치 프로그램으로 바뀌었어요. 설정, 프리셋, 변환 엔진은 그대로 남아요
+ko: FileOrbit 전용 Windows 설치 프로그램으로 바뀌었어요. 설정, 프리셋, 변환 엔진은 그대로 남아요
 ko: 브라우저의 그림이나 파일 링크를 원형 툴바로 바로 끌어 놓을 수 있어요
 ko: 원형 툴바에 뒷면이 생겼어요. Tab 키나 마우스 휠로 뒤집어요
 ko: 자르기가 새로워졌어요. 그림 위에서 A를 눌러 그 자리에서 비율을 골라요
@@ -28,7 +28,7 @@ ko: 강조색을 자유롭게 고르고 원형 툴바를 반투명하게 만들 
 ko: 스페인어, 힌디어, 일본어, 러시아어, 아랍어, 브라질 포르투갈어를 지원해요
 ko: PDF의 표가 Word·한글 표로, Word 수식이 한글 수식으로 바뀌어요
 ko: 전자책·SVG·3D 모델·이메일의 보안 문제와 여러 오류를 고쳤어요
-en: Filee's own Windows installer; your settings, presets and engines stay as they are
+en: FileOrbit's own Windows installer; your settings, presets and engines stay as they are
 en: Drag pictures and file links from a web browser straight onto the donut
 en: The donut has a back face: press Tab or turn the mouse wheel to flip it
 en: A new crop tool: press A over the picture to pick a ratio right there
@@ -38,7 +38,7 @@ en: Any accent colour, and a see-through donut
 en: Spanish, Hindi, Japanese, Russian, Arabic and Brazilian Portuguese
 en: Tables in PDFs become real Word tables, and Arabic or Hindi documents become proper PDFs
 en: Security fixes for e-books, SVG, 3D models and e-mails, and many bug fixes
-zh: 改用 Filee 自己的 Windows 安装程序，设置、预设和转换引擎保持不变
+zh: 改用 FileOrbit 自己的 Windows 安装程序，设置、预设和转换引擎保持不变
 zh: 可以把浏览器中的图片或文件链接直接拖到环形工具栏上
 zh: 环形工具栏有了背面，按 Tab 键或滚动鼠标滚轮即可翻转
 zh: 全新的裁剪工具，在图片上按 A 即可就地选择比例
@@ -48,7 +48,7 @@ zh: 可以任选强调色，并让环形工具栏半透明
 zh: 新增西班牙语、印地语、日语、俄语、阿拉伯语和巴西葡萄牙语界面
 zh: PDF 中的表格可转为真正的 Word 表格，阿拉伯语和印地语文档也能正确转为 PDF
 zh: 修复了电子书、SVG、3D 模型和电子邮件的安全问题以及许多错误
-pl: Własny instalator Filee dla Windows; ustawienia, ustawienia wstępne i silniki zostają bez zmian
+pl: Własny instalator FileOrbit dla Windows; ustawienia, ustawienia wstępne i silniki zostają bez zmian
 pl: Obrazy i linki do plików można przeciągać z przeglądarki prosto na pasek-pierścień
 pl: Pasek-pierścień ma drugą stronę: obróć go klawiszem Tab lub kółkiem myszy
 pl: Nowe kadrowanie: naciśnij A nad obrazem, aby wybrać proporcje na miejscu
@@ -58,7 +58,7 @@ pl: Dowolny kolor akcentu i półprzezroczysty pasek-pierścień
 pl: Język hiszpański, hindi, japoński, rosyjski, arabski i portugalski brazylijski
 pl: Tabele z PDF stają się prawdziwymi tabelami Worda, a dokumenty po arabsku i w hindi poprawnymi plikami PDF
 pl: Poprawki bezpieczeństwa dla e-booków, SVG, modeli 3D i e-maili oraz wiele innych poprawek
-es: Instalador propio de Filee para Windows; tu configuración, ajustes preestablecidos y motores se mantienen
+es: Instalador propio de FileOrbit para Windows; tu configuración, ajustes preestablecidos y motores se mantienen
 es: Arrastra imágenes y enlaces a archivos desde el navegador directamente al menú circular
 es: El menú circular tiene reverso: dale la vuelta con Tab o con la rueda del ratón
 es: Nueva herramienta de recorte: pulsa A sobre la imagen para elegir la proporción ahí mismo
@@ -68,7 +68,7 @@ es: Cualquier color de acento y un menú circular translúcido
 es: Español, hindi, japonés, ruso, árabe y portugués de Brasil
 es: Las tablas de los PDF pasan a ser tablas de Word, y los documentos en árabe o hindi salen bien en PDF
 es: Correcciones de seguridad para libros electrónicos, SVG, modelos 3D y correos, y muchos errores corregidos
-hi: Windows के लिए Filee का अपना इंस्टॉलर; आपकी सेटिंग, प्रीसेट और इंजन वैसे ही रहते हैं
+hi: Windows के लिए FileOrbit का अपना इंस्टॉलर; आपकी सेटिंग, प्रीसेट और इंजन वैसे ही रहते हैं
 hi: ब्राउज़र से चित्र या फ़ाइल के लिंक सीधे डोनट पर खींचें
 hi: डोनट का अब पिछला हिस्सा भी है: Tab दबाएँ या माउस व्हील घुमाकर पलटें
 hi: नया क्रॉप टूल: चित्र पर A दबाकर वहीं अनुपात चुनें
@@ -78,7 +78,7 @@ hi: कोई भी एक्सेंट रंग चुनें और ड�
 hi: स्पैनिश, हिन्दी, जापानी, रूसी, अरबी और ब्राज़ीलियाई पुर्तगाली भाषाएँ
 hi: PDF की तालिकाएँ Word की असली तालिकाएँ बनती हैं, और हिन्दी या अरबी दस्तावेज़ सही PDF बनते हैं
 hi: ई-बुक, SVG, 3D मॉडल और ईमेल की सुरक्षा समस्याएँ और कई गड़बड़ियाँ ठीक की गईं
-ja: Filee 独自の Windows インストーラーになりました。設定・プリセット・変換エンジンはそのままです
+ja: FileOrbit 独自の Windows インストーラーになりました。設定・プリセット・変換エンジンはそのままです
 ja: ブラウザーから画像やファイルへのリンクをドーナツメニューに直接ドラッグできます
 ja: ドーナツメニューに裏面ができました。Tab キーかマウスホイールで裏返せます
 ja: トリミングが新しくなりました。画像の上で A を押すとその場で比率を選べます
@@ -88,7 +88,7 @@ ja: 好きなアクセントカラーを選び、ドーナツメニューを半�
 ja: スペイン語、ヒンディー語、日本語、ロシア語、アラビア語、ブラジルポルトガル語に対応しました
 ja: PDF の表が Word の表になり、アラビア語やヒンディー語の文書も正しく PDF にできます
 ja: 電子書籍・SVG・3D モデル・メールのセキュリティ問題と多くの不具合を修正しました
-ru: Собственный установщик Filee для Windows; настройки, пресеты и движки сохраняются
+ru: Собственный установщик FileOrbit для Windows; настройки, пресеты и движки сохраняются
 ru: Картинки и ссылки на файлы можно перетаскивать из браузера прямо на круговое меню
 ru: У кругового меню есть обратная сторона: переверните его клавишей Tab или колесом мыши
 ru: Новая обрезка: нажмите A над картинкой и выберите пропорции прямо там
@@ -98,7 +98,7 @@ ru: Любой акцентный цвет и полупрозрачное кр�
 ru: Испанский, хинди, японский, русский, арабский и бразильский португальский
 ru: Таблицы из PDF становятся настоящими таблицами Word, а документы на арабском и хинди правильно конвертируются в PDF
 ru: Исправления безопасности для электронных книг, SVG, 3D-моделей и писем, а также много других исправлений
-ar: مثبّت Filee الخاص لنظام Windows، مع بقاء إعداداتك والإعدادات المسبقة والمحركات كما هي
+ar: مثبّت FileOrbit الخاص لنظام Windows، مع بقاء إعداداتك والإعدادات المسبقة والمحركات كما هي
 ar: اسحب الصور وروابط الملفات من المتصفح مباشرةً إلى القائمة الدائرية
 ar: للقائمة الدائرية وجه آخر: اقلبها بمفتاح Tab أو بعجلة الفأرة
 ar: أداة اقتصاص جديدة: اضغط A فوق الصورة لاختيار نسبة الأبعاد في مكانها
@@ -108,7 +108,7 @@ ar: اختر أي لون مميّز واجعل القائمة الدائرية �
 ar: الإسبانية والهندية واليابانية والروسية والعربية والبرتغالية البرازيلية
 ar: تتحول جداول PDF إلى جداول Word حقيقية، وتُحوَّل المستندات العربية والهندية إلى PDF بشكل صحيح
 ar: إصلاحات أمنية للكتب الإلكترونية وSVG والنماذج ثلاثية الأبعاد ورسائل البريد، وإصلاح أخطاء كثيرة
-pt-BR: Instalador próprio do Filee para Windows; suas configurações, predefinições e motores continuam como estão
+pt-BR: Instalador próprio do FileOrbit para Windows; suas configurações, predefinições e motores continuam como estão
 pt-BR: Arraste imagens e links de arquivos do navegador direto para o menu circular
 pt-BR: O menu circular tem um verso: vire-o com Tab ou com a roda do mouse
 pt-BR: Nova ferramenta de recorte: pressione A sobre a imagem para escolher a proporção ali mesmo
@@ -122,24 +122,24 @@ pt-BR: Correções de segurança para e-books, SVG, modelos 3D e e-mails, e muit
 
 ### New
 
-- **Filee's own installer** (Windows). `Filee-<version>-win-Setup.exe` is now Filee's own installer instead of an Inno
-  Setup one; the download names stay the same. It is one card in Filee's look, in every app language (Windows' display
+- **FileOrbit's own installer** (Windows). `FileOrbit-<version>-win-Setup.exe` is now FileOrbit's own installer instead of an Inno
+  Setup one; the download names stay the same. It is one card in FileOrbit's look, in every app language (Windows' display
   language first): **Install**, and **Options** for the language, folder, desktop icon, Explorer menu, starting at
-  sign-in, `filee` on the PATH and the engines to download. While it installs, it shows this version's What's new
-  slides. It installs over Filee 1.x, also from the built-in updater: same folder, your choices and one entry in Apps &
+  sign-in, `fileorbit` on the PATH and the engines to download. While it installs, it shows this version's What's new
+  slides. It installs over FileOrbit 1.x, also from the built-in updater: same folder, your choices and one entry in Apps &
   Features, with settings, presets and engines kept. The uninstaller asks whether to delete your settings (kept unless
   you say so). Setup checks its files before changing anything and puts everything back if an install fails halfway.
   The usual switches still work (`/SILENT`, `/VERYSILENT`, `/SUPPRESSMSGBOXES`, `/NORESTART`, `/DIR=`, `/LANG=`,
-  `/TASKS=`, `/MERGETASKS=`, `/NOICONS`, `/CURRENTUSER`, `/LOG`), and `/NOLAUNCH` doesn't start Filee at the end.
+  `/TASKS=`, `/MERGETASKS=`, `/NOICONS`, `/CURRENTUSER`, `/LOG`), and `/NOLAUNCH` doesn't start FileOrbit at the end.
   Tools that unpacked the old Setup with innounp need the portable zip now.
-- **What's new.** The first time Filee starts after an update, a small window shows the new features as short animated
-  slides (Previous / Next, ← / →, Esc). About → "What's new in Filee 2.0" opens them again. With "Reduce animations"
+- **What's new.** The first time FileOrbit starts after an update, a small window shows the new features as short animated
+  slides (Previous / Next, ← / →, Esc). About → "What's new in FileOrbit 2.0" opens them again. With "Reduce animations"
   each slide is a still picture.
 - **Files from a web browser.** Hold the shortcut key and drag a picture, a link to a file or a download out of
   Chrome, Edge, Firefox or Safari: the donut opens as it does for your own files, and dropping on a slice saves the
   file and converts it. The Home drop zone takes the same drags. Settings → General → "Files dragged from a browser"
   sets where they are saved (Downloads unless you choose another folder) and can keep only the converted file. A badge
-  over the progress ring shows the download. Filee downloads a link itself, without your browser's sign-in, so a file
+  over the progress ring shows the download. FileOrbit downloads a link itself, without your browser's sign-in, so a file
   behind a sign-in has to be saved from the browser first. Web pages, programs and scripts are refused, and nothing is
   run. Attachments dragged out of Outlook and files dragged out of a ZIP in Explorer open the donut too.
 - **The donut's back face** (issue #195). Every donut has a second set of up to 12 slices. While the donut is open,
@@ -183,7 +183,7 @@ pt-BR: Correções de segurança para e-books, SVG, modelos 3D e e-mails, e muit
 - **Theme** (accent picker by @Mustafa1p, donut opacity by @gtxPrime, `theme.json` by @AkiVonAkira). Settings →
   Theme has a colour picker with a hex field next to the accent swatches, and *Donut toolbar opacity* (10 to 100 %,
   issue #276). Softness rounds the donut's slices too (issue #206). A `theme.json` next to `settings.json` can replace
-  Filee's page, surface, text and status colours (docs/CUSTOM-THEMES.md).
+  FileOrbit's page, surface, text and status colours (docs/CUSTOM-THEMES.md).
 - **Reset one donut** (issue #205). *Reset to default* next to *Delete profile* in Settings → Donut toolbar puts a
   built-in donut back as it came, front and back. Your other donuts and your presets stay as they are.
 - **Recent conversions** (by @gtxPrime). Home has a search box over the list, thumbnails of pictures, and *Open file*
@@ -201,13 +201,13 @@ pt-BR: Correções de segurança para e-books, SVG, modelos 3D e e-mails, e muit
 - **A subfolder only when needed** (issue #259, by @flexeykinDev). With "A subfolder", *Only when a file becomes
   several* saves a single result next to the original and keeps the subfolder for files that become several (a PDF
   split into pages).
-- **Dock and menu bar** (macOS, issue #132, by @SeoJCalive). Settings → General → *Show Filee in the Dock* and *Show
-  Filee in the menu bar*. With both off, opening Filee again brings up its window.
-- **macOS 13** (by @yoamzil). Filee runs on macOS 13 Ventura, not only 14 and newer.
+- **Dock and menu bar** (macOS, issue #132, by @SeoJCalive). Settings → General → *Show FileOrbit in the Dock* and *Show
+  FileOrbit in the menu bar*. With both off, opening FileOrbit again brings up its window.
+- **macOS 13** (by @yoamzil). FileOrbit runs on macOS 13 Ventura, not only 14 and newer.
 - **Linux** packages are no longer a preview.
-- **KDE Plasma on Wayland** (experimental, by @IPedrax). With `FILEE_WAYLAND_GESTURES=1`, the drag gesture works on KDE
+- **KDE Plasma on Wayland** (experimental, by @IPedrax). With `FILEORBIT_WAYLAND_GESTURES=1`, the drag gesture works on KDE
   Plasma 6 on Wayland. installer/linux/INSTALL.txt has the steps (the `input` group and a KWin script) and the limits.
-- **Languages.** Filee speaks Spanish (by @danielcastro-dev), Hindi (by @adnan-bhaldar), Japanese (by @sh-ayu),
+- **Languages.** FileOrbit speaks Spanish (by @danielcastro-dev), Hindi (by @adnan-bhaldar), Japanese (by @sh-ayu),
   Russian (by @allamitsamara-cmd), Arabic, right to left in every window and in Setup (by @Mustafa1p), and Brazilian
   Portuguese, also for Portuguese from Portugal (by @RaulSKKS). It picks them when Windows, macOS or Linux does. Hindi,
   Japanese and Arabic bring their own fonts, so they show on systems without one.
@@ -237,7 +237,7 @@ pt-BR: Correções de segurança para e-books, SVG, modelos 3D e e-mails, e muit
 - **Engines without the Visual C++ Redistributable** (Windows, issue #248). rhwp, unhwp and LibreOffice now come with
   the runtime files they need, so HWP conversions no longer fail with "exit -1073741515" on a PC without them. When
   such a file is missing anyway, the message says what to install.
-- **Automatic language** (by @flexeykinDev). Filee follows the display language you chose in Windows, not the
+- **Automatic language** (by @flexeykinDev). FileOrbit follows the display language you chose in Windows, not the
   language Windows was installed in.
 
 ### Fixed
@@ -251,11 +251,11 @@ pt-BR: Correções de segurança para e-books, SVG, modelos 3D e e-mails, e muit
 - An empty file (0 bytes, such as a DOCX made with "New" in Explorer) failed with "Central Directory corrupt". The
   message now says the file is empty, and an empty PDF no longer breaks a merge (issue #157).
 - Some DOCX files (from Tencent Docs, for example) failed with "source file could not be loaded" through LibreOffice.
-  Filee tries again from a cleaned-up copy (issue #141).
-- On macOS, Finder replacements such as QSpace Pro couldn't hand files to Filee, and a donut opened from another
+  FileOrbit tries again from a cleaned-up copy (issue #141).
+- On macOS, Finder replacements such as QSpace Pro couldn't hand files to FileOrbit, and a donut opened from another
   launch could close at once (issue #160).
 - With FFmpeg installed, audio presets counted as available for pictures, which would have made silent files.
-- The donut could sit on a frosted rectangle (issue #269). Filee now takes away a backdrop another program puts on its
+- The donut could sit on a frosted rectangle (issue #269). FileOrbit now takes away a backdrop another program puts on its
   windows, and the log says how transparent windows are drawn.
 - On Linux and macOS, converting a document to PDF that names a font that isn't installed could break other
   conversions running at the same time.
@@ -277,8 +277,8 @@ ko: 일부 SVG가 변환되지 않던 문제와 드롭다운 오류를 고쳤어
 en: Convert PDF to PowerPoint, or to a smaller PDF
 en: Save every frame of a video as pictures
 en: Encode video faster on the graphics chip
-en: Filee gives memory back after conversions and stays light in the tray
-en: Choose whether closing the window keeps Filee in the tray or quits
+en: FileOrbit gives memory back after conversions and stays light in the tray
+en: Choose whether closing the window keeps FileOrbit in the tray or quits
 en: Polish translation
 en: Fixed some SVGs that couldn't be converted and an error in dropdowns
 zh: 可以将 PDF 转为 PowerPoint，或压缩为更小的 PDF
@@ -291,8 +291,8 @@ zh: 修复了部分 SVG 无法转换的问题和下拉列表的错误
 pl: Konwersja PDF do PowerPointa lub do mniejszego PDF
 pl: Zapis każdej klatki wideo jako obrazów
 pl: Szybsze kodowanie wideo na karcie graficznej
-pl: Filee oddaje pamięć po konwersjach i mniej obciąża zasobnik
-pl: Wybór, czy zamknięcie okna zostawia Filee w zasobniku, czy je zamyka
+pl: FileOrbit oddaje pamięć po konwersjach i mniej obciąża zasobnik
+pl: Wybór, czy zamknięcie okna zostawia FileOrbit w zasobniku, czy je zamyka
 pl: Język polski
 pl: Naprawiono niektóre pliki SVG, których nie dało się przekonwertować, i błąd w listach rozwijanych
 -->
@@ -314,13 +314,13 @@ pl: Naprawiono niektóre pliki SVG, których nie dało się przekonwertować, i 
 - **Hardware video encoding** (issue #100). *Use hardware acceleration (graphics chip)* in a video preset encodes
   H.264 and HEVC with NVENC, Quick Sync, AMF, VideoToolbox or VA-API: much faster and lighter on power, slightly larger
   at the same quality. Without a usable chip, the video is encoded as before. Off by default.
-- **Closing the window** (issue #111). The first time you close the main window, Filee asks whether to keep running in
+- **Closing the window** (issue #111). The first time you close the main window, FileOrbit asks whether to keep running in
   the tray or quit, with "Don't ask again". Settings → General → "When I close the window" changes it later.
-- **Request a format** (issue #117). When you bring files Filee can't read to the donut, or a conversion fails for
+- **Request a format** (issue #117). When you bring files FileOrbit can't read to the donut, or a conversion fails for
   that reason, *Request this format* opens a GitHub form with the extension filled in (only the extension, never a
   file name). Encrypted or copy-protected (DRM) files can't be converted, whatever their format.
 - **Ubuntu 22.04** (issue #102). The Linux packages run on Ubuntu 22.04 and newer again, global gestures included.
-- **Polish** (by @rafek1241). Filee speaks Polish, and picks it when Windows, macOS or Linux does.
+- **Polish** (by @rafek1241). FileOrbit speaks Polish, and picks it when Windows, macOS or Linux does.
 - **Other file managers** (issue #124). Gestures set to "File managers and desktop" also start over Files, Directory
   Opus, Total Commander, XYplorer, OneCommander, Q-Dir and FreeCommander, not only Explorer.
 - **calibre for e-book PDFs** (issue #127). With calibre installed and moved above the HWPX writer in Settings →
@@ -328,12 +328,12 @@ pl: Naprawiono niektóre pliki SVG, których nie dało się przekonwertować, i 
 
 ### Improved
 
-- **Memory** (issue #119). Half a minute after the last conversion Filee gives the memory back: Task Manager shows it
+- **Memory** (issue #119). Half a minute after the last conversion FileOrbit gives the memory back: Task Manager shows it
   at a few tens of MB in the tray instead of several hundred. Closing the main window releases it; it opens again where
   and on the page you left it.
-- **Running as administrator** (issue #99). Explorer can't drop files on a Filee that runs as administrator or use its
-  menu. Filee now notices it, says so on Home, and offers *Restart without administrator rights*. A second launch that
-  can't reach the running Filee says why instead of quitting silently.
+- **Running as administrator** (issue #99). Explorer can't drop files on a FileOrbit that runs as administrator or use its
+  menu. FileOrbit now notices it, says so on Home, and offers *Restart without administrator rights*. A second launch that
+  can't reach the running FileOrbit says why instead of quitting silently.
 
 ### Fixed
 
@@ -342,7 +342,7 @@ pl: Naprawiono niektóre pliki SVG, których nie dało się przekonwertować, i 
 - Pressing Ctrl+Space twice in a dropdown, or Ctrl+clicking the selected item, showed an error (issue #107).
 - Long e-books to PDF stopped at 95 % after two minutes (issue #127): the time limit now grows with the text, up to
   an hour.
-- "Retry gestures" could leave gestures dead while Filee said they were running (by @leishifu666).
+- "Retry gestures" could leave gestures dead while FileOrbit said they were running (by @leishifu666).
 - calibre couldn't be downloaded on macOS and Linux: it now comes from calibre's own server.
 
 ## 1.11.0
@@ -398,7 +398,7 @@ zh: 修复了 HWP 转 PDF 时表格内的表格位置偏下的问题
   - With LibreOffice: ClarisWorks, MacWrite, T602, Pocket Word and flat OpenDocument files are read, OTT, OTS, OTP,
     FODT and XLT written, SVG → EMF/WMF and one PDF page → SVG.
   - E-books: KEPUB for Kobo readers, built in.
-- **Sponsor.** "Sponsor" in the sidebar and the About page opens the ways to support Filee (GitHub Sponsors, Patreon,
+- **Sponsor.** "Sponsor" in the sidebar and the About page opens the ways to support FileOrbit (GitHub Sponsors, Patreon,
   Ko-fi, PayPal, Fairy), and sponsors are thanked on the About page.
 
 ### Changed
@@ -410,8 +410,8 @@ zh: 修复了 HWP 转 PDF 时表格内的表格位置偏下的问题
 ### Fixed
 
 - **Desktop icons that stopped reacting to clicks.** After a conversion through the donut, a Ctrl+drag that brought no
-  files (selecting icons on the desktop, dragging a folder) could leave Filee's invisible drag window over the desktop,
-  catching clicks until Filee quit. A donut opened from Explorer's menu on Windows 10 also closes with Esc and clicks
+  files (selecting icons on the desktop, dragging a folder) could leave FileOrbit's invisible drag window over the desktop,
+  catching clicks until FileOrbit quit. A donut opened from Explorer's menu on Windows 10 also closes with Esc and clicks
   elsewhere again.
 - **Tables inside a table cell in HWP → PDF** (issue #49). A table placed in a table cell was drawn too low, over the
   paragraph below it, when the file was HWP (HWPX was fine).
@@ -424,15 +424,15 @@ zh: 修复了 HWP 转 PDF 时表格内的表格位置偏下的问题
 level: recommended
 ko: 서명·도장·로고의 단색 배경을 투명하게 만드는 "배경 제거" 프리셋이 생겼어요
 ko: 자동 변환 폴더에서 하위 폴더의 파일은 결과도 같은 하위 폴더에 저장돼요
-ko: Filee가 켜지는 중에 연 파일이나 업데이트 요청이 사라지던 문제를 고쳤어요
+ko: FileOrbit가 켜지는 중에 연 파일이나 업데이트 요청이 사라지던 문제를 고쳤어요
 ko: 보안 업데이트: PDF 처리에 쓰는 .NET 암호화 라이브러리를 최신 버전으로 바꿨어요
 en: A "Remove background" preset makes the plain backdrop of signatures, stamps and logos transparent
 en: Watch folders keep the subfolders of their files in the output folder
-en: Files opened, or an update started, while Filee is still starting are no longer lost
+en: Files opened, or an update started, while FileOrbit is still starting are no longer lost
 en: Security update: the .NET cryptography library used for PDFs is updated
 zh: 新增"去除背景"预设，可将签名、印章、标志的纯色背景变为透明
 zh: 自动转换文件夹会在输出中保留文件所在的子文件夹
-zh: 修复了 Filee 启动过程中打开的文件或更新请求丢失的问题
+zh: 修复了 FileOrbit 启动过程中打开的文件或更新请求丢失的问题
 zh: 安全更新：处理 PDF 所用的 .NET 加密库已更新
 -->
 
@@ -448,13 +448,13 @@ zh: 安全更新：处理 PDF 所用的 .NET 加密库已更新
 
 - **Watch folders keep subfolders** (issue #72, by @SeoJCalive). With "Include subfolders", files from
   `Inbox\2025\scans` now go to `converted\2025\scans` instead of all into `converted` (where files of the same name
-  became `a (2).pdf`), the way originals are already moved. `filee watch` does the same.
+  became `a (2).pdf`), the way originals are already moved. `fileorbit watch` does the same.
 
 ### Fixed
 
-- **Starting Filee again while it is still starting.** Files opened from the right-click menu or Send To, or the
-  installer's request to close Filee for an update, were lost when Filee took more than a few seconds to start (a
-  slow or busy computer). They now wait until Filee is ready.
+- **Starting FileOrbit again while it is still starting.** Files opened from the right-click menu or Send To, or the
+  installer's request to close FileOrbit for an update, were lost when FileOrbit took more than a few seconds to start (a
+  slow or busy computer). They now wait until FileOrbit is ready.
 - **Security update.** The .NET cryptography library PDFsharp uses (System.Security.Cryptography.Pkcs) is updated to
   10.0.13, which fixes two denial-of-service advisories (CVE-2026-84008, CVE-2026-70162).
 
@@ -484,7 +484,7 @@ zh: 更新通知会显示重要程度和更新内容
 - **Update notices say how much an update matters.** The card names the update required, recommended or optional and
   lists what it changes in one line each, in the app's language (for someone a few versions behind, every version in
   between). Optional updates no longer bring up the card, only the sidebar button; required ones show it every time
-  Filee starts.
+  FileOrbit starts.
 - **LibreOffice for Word and Excel → PDF** (issue #66). Settings → Engines → "When LibreOffice is installed" has two
   new switches, off by default: "Word documents → PDF" (DOCX, DOC, ODT, RTF, laid out as in Word, with Chinese and
   Japanese punctuation rules) and "Spreadsheets → PDF" (XLSX, XLS, ODS, CSV, with the workbook's print area and page
@@ -494,10 +494,10 @@ zh: 更新通知会显示重要程度和更新内容
 
 - **Excel page breaks** (issue #67). XLSX → PDF starts a new page where a page break was set in Excel (Page Layout →
   Breaks), with frozen header rows repeated at the top. This works without LibreOffice.
-- **Fonts for every language in PDFs** (issue #64). Markdown, text, HTML and other documents Filee turns into PDF used
+- **Fonts for every language in PDFs** (issue #64). Markdown, text, HTML and other documents FileOrbit turns into PDF used
   Korean fonts, so Chinese text mixed two fonts character by character. Chinese (Simplified or Traditional) and
   Japanese text now gets a Chinese or Japanese font already on the computer (e.g. Microsoft YaHei), and text in other
-  scripts (Russian, Greek, Thai, Arabic, …) a font that has all its characters. Filee does not download or ship fonts.
+  scripts (Russian, Greek, Thai, Arabic, …) a font that has all its characters. FileOrbit does not download or ship fonts.
 - **한글 boxes and equations in PDFs** (issue #65). In HWP / HWPX → PDF:
   - Boxes inside a text box (the "보기" box of an exam paper) came out narrow, with their content clipped and pictures
     shrunk. They now have the size 한글 shows.
@@ -514,7 +514,7 @@ zh: 更新通知会显示重要程度和更新内容
   the progress card in the bottom-right corner, the card appeared twice.
 - **Blank PDF pages with variable fonts** (issue #61). A Word or 한글 document whose font is installed as a variable
   OpenType font with CFF2 outlines, such as Source Han Serif VF (思源宋体 VF), became a PDF without text. Such a font is
-  now replaced by a similar font already on the computer (e.g. SimSun for Simplified Chinese serif text). Filee does
+  now replaced by a similar font already on the computer (e.g. SimSun for Simplified Chinese serif text). FileOrbit does
   not download or ship fonts.
 
 ## 1.10.1
@@ -526,7 +526,7 @@ zh: 更新通知会显示重要程度和更新内容
   - **Cut the blank space above and below each page.** The pages follow each other without wide white gaps; about
     4 mm stays around the content.
   - **Split into several images when the stack is too tall for the format.** JPG holds up to 65,500 px and WebP
-    16,383 px. Instead of shrinking the long image to fit, Filee writes several (name_1, name_2, …), split between
+    16,383 px. Instead of shrinking the long image to fit, FileOrbit writes several (name_1, name_2, …), split between
     pages, at full size.
 - **Resize to a width.** "Set the width" next to "Scale by percent" and "Limit the long edge" makes images, and long
   images, a given number of pixels wide (e.g. 800 or 1200). Smaller images are left as they are.
@@ -550,10 +550,10 @@ zh: 更新通知会显示重要程度和更新内容
   in black. Only photos over about 36 megapixels (48 MP phone cameras) are scaled down, to the largest picture H.264
   and VP9 players decode. Animated GIF/WebP and PDF pages still become a moving video or a slideshow.
 - **MOV ↔ MP4 without quality loss.** When the new format can hold the video and sound as they are, like an iPhone
-  video (HEVC or H.264 with AAC) going from MOV to MP4, Filee now only rewraps them instead of re-encoding: nothing
+  video (HEVC or H.264 with AAC) going from MOV to MP4, FileOrbit now only rewraps them instead of re-encoding: nothing
   is lost, HDR and 10-bit colour stay, and it takes seconds. The same goes for MKV, WebM and TS. Choosing a smaller
   size (e.g. 720p), another audio bitrate or quality **Small** still re-encodes.
-- **Save images as HEIC** (with FFmpeg). Any image Filee reads → HEIC, the format iPhones take photos in: about a
+- **Save images as HEIC** (with FFmpeg). Any image FileOrbit reads → HEIC, the format iPhones take photos in: about a
   quarter of a JPG's size at the same quality, stored in 512-pixel tiles like a phone photo, upright, with the colour
   profile and Exif kept. The **HEIC** preset is on the Presets page (quality 80); add it to a donut to use it.
   Transparent areas are filled with the preset's background colour.
@@ -562,7 +562,7 @@ zh: 更新通知会显示重要程度和更新内容
 
 ### New
 
-- **Engine updates.** When a Filee update brings a newer version of an engine you downloaded (FFmpeg, LibreOffice,
+- **Engine updates.** When a FileOrbit update brings a newer version of an engine you downloaded (FFmpeg, LibreOffice,
   Pandoc, Ghostscript, calibre), a card in the bottom-right corner says so once per version, and Settings → Engines
   shows "New version" with an **Update** button. Engines you never installed are left alone, and the card follows
   "Check for updates automatically".
@@ -584,9 +584,9 @@ zh: 更新通知会显示重要程度和更新内容
 
 ### New
 
-- **Sponsor Filee.** Filee stays free; if it helps you, you can now support its development. **Sponsor** sits at the
+- **Sponsor FileOrbit.** FileOrbit stays free; if it helps you, you can now support its development. **Sponsor** sits at the
   bottom of the navigation next to **GitHub**, above the version, and on the About page next to Star and Report. It
-  opens Fairy when Filee is in Korean (Korean cards and easy-pay) and GitHub Sponsors in other languages.
+  opens Fairy when FileOrbit is in Korean (Korean cards and easy-pay) and GitHub Sponsors in other languages.
 
 ## 1.8.0
 
@@ -619,8 +619,8 @@ zh: 更新通知会显示重要程度和更新内容
 
 ### Documentation
 
-- docs/ENGINES.md said Filee never uses engines installed on the computer. It does, as the last choice after a copy
-  you picked and Filee's own: that is how FFmpeg and Ghostscript are found on macOS. The order is now described.
+- docs/ENGINES.md said FileOrbit never uses engines installed on the computer. It does, as the last choice after a copy
+  you picked and FileOrbit's own: that is how FFmpeg and Ghostscript are found on macOS. The order is now described.
 
 ## 1.7.2
 
@@ -637,25 +637,25 @@ zh: 更新通知会显示重要程度和更新内容
 
 - Moving the pointer from one slice of the donut to another no longer makes the slice it left flash in the accent
   colour as its highlight fades.
-- After Filee sat unused for a long time, the donut could take seconds to appear or open without its animation. A
+- After FileOrbit sat unused for a long time, the donut could take seconds to appear or open without its animation. A
   frame the animation waited for could get lost; the donut now asks again and, if frames still don't come, shows
   itself fully open.
 - With "Reduce animations" following Windows, a moment when Windows reported animations off (a remote session,
-  waking from sleep) could switch them off in Filee until the setting was changed. Filee reads the Windows setting
+  waking from sleep) could switch them off in FileOrbit until the setting was changed. FileOrbit reads the Windows setting
   again whenever the donut or the main window opens.
 
 ## 1.7.0
 
 ### macOS and Linux (preview)
 
-- Filee runs on macOS 14 or later (Apple silicon and Intel) and on Linux (x64 and ARM64). Download the package for
+- FileOrbit runs on macOS 14 or later (Apple silicon and Intel) and on Linux (x64 and ARM64). Download the package for
   your system from this release and run `install.sh` in it. These are previews: the macOS app isn't notarized yet,
   so macOS asks you to allow it once under System Settings → Privacy & Security.
-- macOS: hold Option and drag files to open the donut. Filee asks for the Accessibility permission the gesture needs
-  and starts it as soon as you switch Filee on. "Convert with Filee" is in Finder's right-click menu.
+- macOS: hold Option and drag files to open the donut. FileOrbit asks for the Accessibility permission the gesture needs
+  and starts it as soon as you switch FileOrbit on. "Convert with FileOrbit" is in Finder's right-click menu.
 - Linux: the drag gesture works in an X11 session (on Ubuntu, "Ubuntu on Xorg" on the login screen). On Wayland, use
   the drop zone and the right-click action in Nautilus, Nemo, Thunar or Dolphin.
-- FFmpeg and Ghostscript come from Homebrew on macOS and from your distribution's packages on Linux. Filee finds them
+- FFmpeg and Ghostscript come from Homebrew on macOS and from your distribution's packages on Linux. FileOrbit finds them
   by itself.
 
 ### New
@@ -696,7 +696,7 @@ zh: 更新通知会显示重要程度和更新内容
 ### Fixes
 
 - Converting audio to Opus or Ogg Vorbis now keeps the album art. FFmpeg can't put a picture into those files, so
-  Filee writes it the way they store pictures (a METADATA_BLOCK_PICTURE tag); title, artist and the other tags stay
+  FileOrbit writes it the way they store pictures (a METADATA_BLOCK_PICTURE tag); title, artist and the other tags stay
   too. Matroska audio (MKA) gets the album art as a cover attachment.
 
 ## 1.5.1
@@ -706,20 +706,20 @@ zh: 更新通知会显示重要程度和更新内容
 - Sometimes, after Ctrl+drag opened the donut, the format under the dragged files didn't light up and dropping
   didn't pick it, until a while later. The donut's animation could wait forever for a frame that never came; it now
   starts again after a quarter of a second.
-- Each drag over the donut writes one line to the log (`%APPDATA%\Filee\logs`), so if a donut ever ignores a drag
+- Each drag over the donut writes one line to the log (`%APPDATA%\FileOrbit\logs`), so if a donut ever ignores a drag
   again, the log shows whether the drag reached it.
 
 ## 1.5.0
 
 ### FFmpeg, calibre and the others you already have are used by themselves
 
-- Filee now finds FFmpeg, calibre, Pandoc, Ghostscript and LibreOffice that are already on your PC, without asking
+- FileOrbit now finds FFmpeg, calibre, Pandoc, Ghostscript and LibreOffice that are already on your PC, without asking
   you to download them: on the PATH (Scoop's shims included) or where their installers put them (LibreOffice,
   calibre and Ghostscript under Program Files). Settings → Engines shows "Found on this PC" and the folder.
-- If that copy is older than the version Filee is tested with, Settings → Engines recommends an update. It keeps
+- If that copy is older than the version FileOrbit is tested with, Settings → Engines recommends an update. It keeps
   working; most conversions don't need the newest version.
-- Order: a copy you chose with **Use my copy…**, then Filee's own download (if you installed it), then one found on
-  the PC. **Install** is still there if you'd rather use Filee's tested copy. **Check again** searches again after
+- Order: a copy you chose with **Use my copy…**, then FileOrbit's own download (if you installed it), then one found on
+  the PC. **Install** is still there if you'd rather use FileOrbit's tested copy. **Check again** searches again after
   you install something.
 
 ### One multi-page TIFF
@@ -740,12 +740,12 @@ zh: 更新通知会显示重要程度和更新内容
 ### Updates install themselves
 
 - In an installed copy, **Update** (bottom of the menu, tray menu, the update notice, Settings → General) now
-  downloads the new installer inside Filee, checks it against the release's SHA-256 file and runs it without the setup
-  wizard. Setup closes Filee, updates it, keeps your settings and engines and starts Filee again. Windows asks for
+  downloads the new installer inside FileOrbit, checks it against the release's SHA-256 file and runs it without the setup
+  wizard. Setup closes FileOrbit, updates it, keeps your settings and engines and starts FileOrbit again. Windows asks for
   administrator rights once.
 - The sidebar, tray menu, Settings → General and the notice show the download progress.
 - If the download or the installer fails (no connection, a file that doesn't match its checksum, an installer
-  that won't start), Filee tells you, and after OK it opens filee.sh so you can download the new version there.
+  that won't start), FileOrbit tells you, and after OK it opens fileorbit.sh so you can download the new version there.
 - The portable copy still opens the release page: download the new ZIP and unpack it over the old folder.
 - Updating **to** 1.4.0 from an older version still goes the old way. From 1.4.0 on, it's one click.
 
@@ -763,16 +763,16 @@ zh: 更新通知会显示重要程度和更新内容
   preset (photos, videos, PDFs, archive conversions).
 - Not when several files become one (merged PDF, several files packed into one ZIP): that file has no single original.
 - The per-preset option from 1.3.1 stays, for keeping dates with some presets only.
-- The `filee` command follows the default save location and this switch too.
+- The `fileorbit` command follows the default save location and this switch too.
 
 ### Use the engines you already have
 
 - Settings → Engines → **Use my copy…** next to FFmpeg, calibre, Pandoc, Ghostscript and LibreOffice. Pick the
-  program (`ffmpeg.exe`, `ebook-convert.exe`, `pandoc.exe`, `gswin64c.exe` or `soffice.exe`) and Filee uses it
+  program (`ffmpeg.exe`, `ebook-convert.exe`, `pandoc.exe`, `gswin64c.exe` or `soffice.exe`) and FileOrbit uses it
   instead of downloading its own. **Stop using it** goes back.
 - FFmpeg needs `ffprobe.exe` in the same folder (most builds have both). Picking a build's main folder finds its
   `bin` folder too.
-- The `filee` command uses the same copies.
+- The `fileorbit` command uses the same copies.
 
 ## 1.3.1
 
@@ -796,17 +796,17 @@ zh: 更新通知会显示重要程度和更新内容
 
 ## 1.3.0
 
-### The `filee` command line
+### The `fileorbit` command line
 
-- Setup can add the `filee` command to PATH. `filee convert` converts files, wildcards (`*.heic`) and folders with
-  `--to <format>` or one of your presets; `filee watch` converts files that land in a folder; `filee formats` and
-  `filee presets` list what's available.
+- Setup can add the `fileorbit` command to PATH. `fileorbit convert` converts files, wildcards (`*.heic`) and folders with
+  `--to <format>` or one of your presets; `fileorbit watch` converts files that land in a folder; `fileorbit formats` and
+  `fileorbit presets` list what's available.
 - `--json` prints the result for scripts. Exit codes: 0 all converted, 1 some failed, 2 wrong arguments or a missing
-  file, 3 nothing to convert. Guide: https://filee.sh/cli/
+  file, 3 nothing to convert. Guide: https://fileorbit.sh/cli/
 
 ### Watch folders
 
-- A new **Watch folders** page: files that land in a folder you choose are converted while Filee runs, once
+- A new **Watch folders** page: files that land in a folder you choose are converted while FileOrbit runs, once
   downloads and copies are complete. Keep the originals, or move them to an `originals` folder so the folder works
   like an inbox.
 
@@ -816,5 +816,5 @@ zh: 更新通知会显示重要程度和更新内容
 
 ### Fixes
 
-- Ctrl+drag stopped working after the Photos app had been opened, until Filee was restarted. The donut now stays on
+- Ctrl+drag stopped working after the Photos app had been opened, until FileOrbit was restarted. The donut now stays on
   top of other windows.

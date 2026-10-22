@@ -1,11 +1,11 @@
 # Adding a language
 
-1. Copy `src/Filee.App/Assets/i18n/en.json` to `<code>.json` (e.g. `ja.json`, `de.json`, `zh-TW.json`).
+1. Copy `src/FileOrbit.App/Assets/i18n/en.json` to `<code>.json` (e.g. `ja.json`, `de.json`, `zh-TW.json`).
    The file is a flat list of `"key": "text"` pairs.
 2. Translate the values. Keep `{0}`, `{1}` placeholders — a test checks they match English.
    Keep the text short where English is short (buttons, donut labels).
-3. Register the language in `AppLanguages.All` (`src/Filee.App/Services/AppLanguages.cs`) with its native name,
-   e.g. `("ja", "日本語")`; the order there is the order of the language pickers. Setup (`src/Filee.Setup`) offers it
+3. Register the language in `AppLanguages.All` (`src/FileOrbit.App/Services/AppLanguages.cs`) with its native name,
+   e.g. `("ja", "日本語")`; the order there is the order of the language pickers. Setup (`src/FileOrbit.Setup`) offers it
    too. If the OS culture should pick it automatically, extend `LocalizationService.Resolve`.
 4. `LocalizationTests.Languages` automatically checks every registered language for key and placeholder parity.
 5. If the script needs another font, add a static Noto font to `build/fetch-fonts.ps1`
@@ -14,7 +14,7 @@
    Pictures and drawings that must not mirror (the donut, the crop canvas, animated images, logos) set
    `FlowDirection="LeftToRight"` on themselves; custom-drawn text is shaped in the UI culture's direction, as
    `DonutMenu` does.
-6. Run `dotnet test` and look at the screenshots in `tests/Filee.App.Tests/bin/.../screenshots`
+6. Run `dotnet test` and look at the screenshots in `tests/FileOrbit.App.Tests/bin/.../screenshots`
    (add your language to `RenderTests.Pages` to render a few pages).
 
 Missing keys fall back to English at runtime, but the test suite requires every language to be complete.

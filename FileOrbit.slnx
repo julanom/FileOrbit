@@ -1,0 +1,26 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FileOrbit.Core/FileOrbit.Core.csproj" />
+    <Project Path="src/FileOrbit.Engines/FileOrbit.Engines.csproj" />
+    <Project Path="src/FileOrbit.Platform.Windows/FileOrbit.Platform.Windows.csproj" />
+    <Project Path="src/FileOrbit.Platform.Linux/FileOrbit.Platform.Linux.csproj" />
+    <Project Path="src/FileOrbit.Platform.MacOS/FileOrbit.Platform.MacOS.csproj" />
+    <Project Path="src/FileOrbit.App/FileOrbit.App.csproj" />
+    <Project Path="src/FileOrbit.Cli/FileOrbit.Cli.csproj" />
+    <Project Path="src/FileOrbit.Setup/FileOrbit.Setup.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FileOrbit.Core.Tests/FileOrbit.Core.Tests.csproj" />
+    <Project Path="tests/FileOrbit.Engines.Tests/FileOrbit.Engines.Tests.csproj" />
+    <Project Path="tests/FileOrbit.App.Tests/FileOrbit.App.Tests.csproj" />
+    <Project Path="tests/FileOrbit.Cli.Tests/FileOrbit.Cli.Tests.csproj" />
+    <Project Path="tests/FileOrbit.Platform.Tests/FileOrbit.Platform.Tests.csproj" />
+    <Project Path="tests/FileOrbit.Setup.Tests/FileOrbit.Setup.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path=".editorconfig" />
+  </Folder>
+</Solution>

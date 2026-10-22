@@ -29,16 +29,16 @@ publish="$app/Contents/MacOS"
 resources="$app/Contents/Resources"
 mkdir -p "$publish" "$resources"
 
-dotnet publish "$root/src/Filee.App/Filee.App.csproj" -c Release -r "$runtime" --self-contained true \
-  -p:Version="$version" -p:FileeRelease=true -p:PublishReadyToRun=false -o "$publish"
-dotnet publish "$root/src/Filee.Cli/Filee.Cli.csproj" -c Release -r "$runtime" --self-contained true \
-  -p:Version="$version" -p:FileeRelease=true -p:PublishReadyToRun=false -o "$publish"
-chmod +x "$publish/Filee" "$publish/filee-cli"
+dotnet publish "$root/src/FileOrbit.App/FileOrbit.App.csproj" -c Release -r "$runtime" --self-contained true \
+  -p:Version="$version" -p:FileOrbitRelease=true -p:PublishReadyToRun=false -o "$publish"
+dotnet publish "$root/src/FileOrbit.Cli/FileOrbit.Cli.csproj" -c Release -r "$runtime" --self-contained true \
+  -p:Version="$version" -p:FileOrbitRelease=true -p:PublishReadyToRun=false -o "$publish"
+chmod +x "$publish/FileOrbit" "$publish/fileorbit-cli"
 
 # The portable app depends on these small engines. The Windows installer and the general portable build already
 # bundle them; keep the native macOS package equally complete. Read the pinned URLs and hashes from the shared engine
 # manifest so a package can never silently pick up an unreviewed engine release.
-engine_manifest="$root/src/Filee.Engines/Infrastructure/engines.json"
+engine_manifest="$root/src/FileOrbit.Engines/Infrastructure/engines.json"
 engine_cache="$root/build/.cache/portable-downloads"
 mkdir -p "$engine_cache" "$publish/engines"
 fetch_portable_engine() {
@@ -110,13 +110,13 @@ plutil -lint "$app/Contents/Info.plist"
 iconset="$stage/fileorbit.iconset"
 mkdir -p "$iconset"
 for size in 16 32 128 256 512; do
-  sips -z "$size" "$size" "$root/src/Filee.App/Assets/Icons/filee.png" \
+  sips -z "$size" "$size" "$root/src/FileOrbit.App/Assets/Icons/fileorbit.png" \
     --out "$iconset/icon_${size}x${size}.png" >/dev/null
   pixels=$((size * 2))
-  sips -z "$pixels" "$pixels" "$root/src/Filee.App/Assets/Icons/filee.png" \
+  sips -z "$pixels" "$pixels" "$root/src/FileOrbit.App/Assets/Icons/fileorbit.png" \
     --out "$iconset/icon_${size}x${size}@2x.png" >/dev/null
 done
-iconutil -c icns "$iconset" -o "$resources/filee.icns"
+iconutil -c icns "$iconset" -o "$resources/fileorbit.icns"
 
 for localization in "$root"/installer/macos/*.lproj; do
   cp -R "$localization" "$resources/"
@@ -126,8 +126,8 @@ cp "$root/installer/macos/install.sh" "$root/installer/macos/uninstall.sh" "$roo
 chmod +x "$package/install.sh" "$package/uninstall.sh"
 
 entitlements="$root/installer/macos/entitlements.plist"
-find "$publish" -type f ! -path "$publish/Filee" -exec codesign --force --sign - --entitlements "$entitlements" {} \;
-codesign --force --sign - --entitlements "$entitlements" "$publish/Filee"
+find "$publish" -type f ! -path "$publish/FileOrbit" -exec codesign --force --sign - --entitlements "$entitlements" {} \;
+codesign --force --sign - --entitlements "$entitlements" "$publish/FileOrbit"
 codesign --force --sign - --entitlements "$entitlements" "$app"
 codesign --verify --deep --strict "$app"
 

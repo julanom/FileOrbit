@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>FileOrbit.Platform.MacOS</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FileOrbit.Core\FileOrbit.Core.csproj" />
+    <InternalsVisibleTo Include="FileOrbit.Platform.Tests" />
+  </ItemGroup>
+</Project>

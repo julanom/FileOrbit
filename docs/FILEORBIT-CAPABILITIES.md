@@ -12,7 +12,7 @@ working. All processing is local. There are no uploads, accounts, subscriptions 
 | Documents | DOCX/DOCM/DOTX, EML/MSG, DOC, ODT/FODT/OTT, RTF, WPS/WPD, Pages and more | PDF, DOCX, HWPX, EPUB, TXT, HTML; MSG → EML; ODT/FODT/OTT | Built in for modern core routes; LibreOffice for many legacy formats |
 | Spreadsheets | XLSX/XLSM/XLS/XLT, ODS/OTS/FODS, CSV/TSV, Numbers/ET | PDF, XLSX, ODS, CSV, TSV, JSON, HWPX, HTML | Built in for XLSX/CSV/TSV core; LibreOffice for legacy/vendor formats |
 | Presentations | PPTX/PPTM/POTX/PPSX, PPT, ODP/OTP/FODP, Keynote | PDF, PNG, JPG, DOCX, HWPX; OTP | Partial; LibreOffice is needed for many legacy/vendor inputs |
-| HWP | HWP, HWPX | PDF, PNG, DOCX, HWP ↔ HWPX, TXT, Markdown, HTML | Built in through Filee's HWP engines |
+| HWP | HWP, HWPX | PDF, PNG, DOCX, HWP ↔ HWPX, TXT, Markdown, HTML | Built in through FileOrbit's HWP engines |
 | Text/markup | TXT, Markdown, HTML, reStructuredText, LaTeX, Org, AsciiDoc, Typst, MediaWiki, DocBook, Jupyter, Textile, man, OPML | PDF, DOCX, HWPX, EPUB, mutual markup conversions, PPTX slides | Markdown core built in; broad markup routes need Pandoc |
 | E-books | EPUB, KEPUB, MOBI/AZW family, FB2, CBZ/CBR/CB7, HTMLZ/TXTZ, LIT, LRF, CHM, PDB and more | PDF, EPUB, KEPUB, DOCX, TXT, HTML, HWPX, MOBI, AZW3 | Partial; calibre is required for several proprietary formats |
 | Video | MP4, MOV, MKV, WEBM, AVI, WMV, FLV, MPEG, TS/M2TS, 3GP, OGV, VOB and more | MP4 (H.264/HEVC/AV1), WEBM, MOV, MKV, AVI, GIF, APNG, MP3, M4A, 720p, subtitle extraction, every-frame PNG/JPG extraction, VideoToolbox hardware encoding | Optional FFmpeg engine |

@@ -63,10 +63,10 @@ function Invoke-Checked([string]$name, [scriptblock]$command) {
 }
 
 if (-not $SkipFonts) { & (Join-Path $PSScriptRoot 'fetch-fonts.ps1') }
-foreach ($project in @('Filee.App', 'Filee.Cli')) {
+foreach ($project in @('FileOrbit.App', 'FileOrbit.Cli')) {
     Invoke-Checked "Publish $project" {
         dotnet publish (Join-Path $root "src/$project/$project.csproj") -c Release -r $Runtime --self-contained true `
-            "-p:Version=$Version" -p:FileeRelease=true -p:PublishReadyToRun=false -o $publish
+            "-p:Version=$Version" -p:FileOrbitRelease=true -p:PublishReadyToRun=false -o $publish
     }
 }
 $engines = Join-Path $publish 'engines'
@@ -79,7 +79,7 @@ if ($RhwpOverride) {
 else {
     & (Join-Path $PSScriptRoot 'fetch-portable-engines.ps1') -Runtime $Runtime -Destination $engines
 }
-foreach ($name in @('Filee', 'filee-cli')) {
+foreach ($name in @('FileOrbit', 'fileorbit-cli')) {
     $executable = Join-Path $publish $name
     if (-not (Test-Path -LiteralPath $executable -PathType Leaf)) { throw "Publish did not produce $name" }
     Invoke-Checked 'Executable permissions' { chmod +x $executable }
@@ -98,9 +98,9 @@ if ($Runtime.StartsWith('osx-')) {
     $info.Replace('__VERSION__', $bundleVersion).Replace('__BUNDLE_VERSION__', $bundleVersion) |
         Set-Content -LiteralPath (Join-Path $contents 'Info.plist') -Encoding utf8NoBOM
     Invoke-Checked 'Validate Info.plist' { plutil -lint (Join-Path $contents 'Info.plist') }
-    $iconset = Join-Path $stage 'filee.iconset'
+    $iconset = Join-Path $stage 'fileorbit.iconset'
     New-Item -ItemType Directory -Path $iconset | Out-Null
-    $sourceIcon = Join-Path $root 'src/Filee.App/Assets/Icons/filee.png'
+    $sourceIcon = Join-Path $root 'src/FileOrbit.App/Assets/Icons/fileorbit.png'
     foreach ($size in @(16, 32, 128, 256, 512)) {
         foreach ($scale in @(1, 2)) {
             $pixels = $size * $scale
@@ -109,8 +109,8 @@ if ($Runtime.StartsWith('osx-')) {
             Invoke-Checked 'Render app icon' { sips -z $pixels $pixels $sourceIcon --out $target | Out-Null }
         }
     }
-    Invoke-Checked 'Create app icon' { iconutil -c icns $iconset -o (Join-Path $resources 'filee.icns') }
-    # Translations of the service title ("Convert with Filee") in Finder's right-click menu.
+    Invoke-Checked 'Create app icon' { iconutil -c icns $iconset -o (Join-Path $resources 'fileorbit.icns') }
+    # Translations of the service title ("Convert with FileOrbit") in Finder's right-click menu.
     foreach ($localization in Get-ChildItem -LiteralPath (Join-Path $root 'installer/macos') -Directory -Filter '*.lproj') {
         Copy-Item -LiteralPath $localization.FullName -Destination $resources -Recurse
     }
@@ -119,7 +119,7 @@ if ($Runtime.StartsWith('osx-')) {
     if ($SigningIdentity -ne '-') { $signOptions += @('--timestamp', '--options', 'runtime') }
     # Every file in Contents/MacOS is code to codesign, the .NET assemblies too (their signature goes into extended
     # attributes): signing the main executable checks all of them. Deepest paths first, the main executable last.
-    $mainExecutable = Join-Path $publish 'Filee'
+    $mainExecutable = Join-Path $publish 'FileOrbit'
     $files = Get-ChildItem -LiteralPath $publish -Recurse -File | Where-Object { $_.FullName -ne $mainExecutable } |
         Sort-Object { $_.FullName.Length } -Descending
     foreach ($file in $files) {
@@ -133,7 +133,7 @@ if ($Runtime.StartsWith('osx-')) {
     Copy-Item -LiteralPath (Join-Path $root 'installer/macos/INSTALL.txt') -Destination $package
 }
 else {
-    Copy-Item -LiteralPath (Join-Path $root 'src/Filee.App/Assets/Icons/filee.png') -Destination $package
+    Copy-Item -LiteralPath (Join-Path $root 'src/FileOrbit.App/Assets/Icons/fileorbit.png') -Destination $package
     Copy-Item -LiteralPath (Join-Path $root 'installer/linux/install.sh') -Destination $package
     Copy-Item -LiteralPath (Join-Path $root 'installer/linux/uninstall.sh') -Destination $package
     Copy-Item -LiteralPath (Join-Path $root 'installer/linux/INSTALL.txt') -Destination $package

@@ -17,9 +17,9 @@ if [ "$bundle_id" != 'com.fileorbit.app' ]; then
     printf '%s\n' 'The bundle is not FileOrbit.'
     exit 1
 fi
-"$install_dir/Contents/MacOS/Filee" --uninstall-cleanup
-if [ -L "$HOME/.local/bin/filee" ] && [ "$(readlink "$HOME/.local/bin/filee")" = "$install_dir/Contents/MacOS/filee-cli" ]; then
-    rm -- "$HOME/.local/bin/filee"
+"$install_dir/Contents/MacOS/FileOrbit" --uninstall-cleanup
+if [ -L "$HOME/.local/bin/fileorbit" ] && [ "$(readlink "$HOME/.local/bin/fileorbit")" = "$install_dir/Contents/MacOS/fileorbit-cli" ]; then
+    rm -- "$HOME/.local/bin/fileorbit"
 fi
 rm -rf -- "$install_dir"
 printf '%s\n' 'FileOrbit was removed. Your settings and conversion results were kept.'

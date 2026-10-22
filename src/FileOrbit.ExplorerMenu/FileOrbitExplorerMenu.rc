@@ -1,0 +1,40 @@
+// Version information of the Explorer context-menu DLL. build/build-explorer-menu.ps1 passes the app version as
+// FILEORBIT_VERSION_MAJOR/MINOR/PATCH and FILEORBIT_VERSION_TEXT.
+
+#include <winver.h>
+
+#ifndef FILEORBIT_VERSION_MAJOR
+#define FILEORBIT_VERSION_MAJOR 0
+#define FILEORBIT_VERSION_MINOR 0
+#define FILEORBIT_VERSION_PATCH 0
+#define FILEORBIT_VERSION_TEXT "0.0.0"
+#endif
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION FILEORBIT_VERSION_MAJOR, FILEORBIT_VERSION_MINOR, FILEORBIT_VERSION_PATCH, 0
+PRODUCTVERSION FILEORBIT_VERSION_MAJOR, FILEORBIT_VERSION_MINOR, FILEORBIT_VERSION_PATCH, 0
+FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+FILEFLAGS 0
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_DLL
+FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "FileOrbit contributors"
+            VALUE "FileDescription", "FileOrbit File Explorer context menu"
+            VALUE "FileVersion", FILEORBIT_VERSION_TEXT
+            VALUE "InternalName", "FileOrbitExplorerMenu"
+            VALUE "LegalCopyright", "Copyright (c) FileOrbit contributors. MIT License."
+            VALUE "OriginalFilename", "FileOrbitExplorerMenu.dll"
+            VALUE "ProductName", "FileOrbit"
+            VALUE "ProductVersion", FILEORBIT_VERSION_TEXT
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END

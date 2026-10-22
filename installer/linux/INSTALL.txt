@@ -1,6 +1,6 @@
 FileOrbit for Linux (x64 and ARM64 preview)
 
-Run ./Filee to open FileOrbit, or ./filee-cli help for the compatibility CLI.
+Run ./FileOrbit to open FileOrbit, or ./fileorbit-cli help for the compatibility CLI.
 The binary retains its internal engine name; the desktop launcher is FileOrbit.
 
 Run ./install.sh to install for the current user. Python 3 is required.

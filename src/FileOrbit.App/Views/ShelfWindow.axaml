@@ -1,0 +1,40 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="using:FileOrbit.App.Views"
+        x:Class="FileOrbit.App.Views.ShelfWindow"
+        x:DataType="v:ShelfViewModel"
+        Title="FileOrbit Shelf"
+        Width="340" MinHeight="180" MaxHeight="560"
+        WindowStartupLocation="CenterScreen"
+        Topmost="True" ShowInTaskbar="False" CanResize="True"
+        Background="{DynamicResource WindowBackgroundBrush}">
+  <Grid RowDefinitions="Auto,*" Margin="14">
+    <DockPanel Margin="0,0,0,10">
+      <Button DockPanel.Dock="Right" Classes="ghost" Content="Clear" Click="OnClear" />
+      <StackPanel>
+        <TextBlock FontSize="18" FontWeight="SemiBold" Text="FileOrbit Shelf" />
+        <TextBlock Classes="caption" Text="Drag an item out when you need it." />
+      </StackPanel>
+    </DockPanel>
+    <Border Grid.Row="1" Classes="card" DragDrop.AllowDrop="True" x:Name="DropArea">
+      <Grid>
+        <TextBlock Text="Drop files here" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Classes="muted" IsVisible="{Binding IsEmpty}" />
+        <ListBox ItemsSource="{Binding Items}" Background="Transparent" BorderThickness="0"
+                 IsVisible="{Binding HasItems}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="v:ShelfItem">
+              <Grid ColumnDefinitions="*,Auto" Margin="2,4" PointerPressed="OnItemPointerPressed">
+                <StackPanel>
+                  <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding Path}" Classes="caption" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="icon" Content="×" Tag="{Binding Path}" Click="OnRemove" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>

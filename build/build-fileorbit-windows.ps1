@@ -11,12 +11,12 @@ New-Item -ItemType Directory -Force -Path $publish, $OutputDir | Out-Null
 $OutputDir = (Resolve-Path $OutputDir).Path
 $archive = Join-Path $OutputDir "$name.zip"
 if (Test-Path $archive) { throw 'Output already exists.' }
-foreach ($project in @('Filee.App','Filee.Cli')) {
-    dotnet publish (Join-Path $root "src/$project/$project.csproj") -c Release -r win-x64 --self-contained true -p:FileeRelease=true -p:PublishReadyToRun=false -o $publish
+foreach ($project in @('FileOrbit.App','FileOrbit.Cli')) {
+    dotnet publish (Join-Path $root "src/$project/$project.csproj") -c Release -r win-x64 --self-contained true -p:FileOrbitRelease=true -p:PublishReadyToRun=false -o $publish
     if ($LASTEXITCODE -ne 0) { throw "Publish failed: $project" }
 }
 & (Join-Path $root 'build/fetch-engines.ps1') -Destination (Join-Path $publish 'engines') -Only rhwp,7zip -RuntimeTo $publish
-Rename-Item (Join-Path $publish 'Filee.exe') 'FileOrbit.exe'
+Rename-Item (Join-Path $publish 'FileOrbit.exe') 'FileOrbit.exe'
 foreach ($file in @('LICENSE','THIRD-PARTY-NOTICES.md')) {
     Copy-Item (Join-Path $root $file) $publish
 }

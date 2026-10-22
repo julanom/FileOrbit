@@ -1,0 +1,58 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FileOrbit.App.ViewModels" x:Class="FileOrbit.App.Views.MainWindow" x:DataType="vm:MainWindowViewModel"
+        Title="FileOrbit" Classes="orbitShell" Icon="avares://FileOrbit/Assets/Icons/fileorbit.ico"
+        Width="1120" Height="780" MinWidth="840" MinHeight="580"
+        TransparencyLevelHint="AcrylicBlur,Blur,None" Background="Transparent" WindowStartupLocation="CenterScreen">
+  <Border Background="{DynamicResource OrbitBackdrop}" Padding="12">
+    <Grid ColumnDefinitions="204,12,*">
+      <Border Classes="orbitGlass" Padding="12,18,12,12">
+        <DockPanel>
+          <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="8,0,8,26">
+            <Image Source="avares://FileOrbit/Assets/Icons/fileorbit.png" Width="48" Height="48" HorizontalAlignment="Left" />
+            <TextBlock Text="FileOrbit" FontSize="23" FontWeight="SemiBold" LetterSpacing="-0.5" />
+            <TextBlock Classes="caption" Text="{DynamicResource app.tagline}" TextWrapping="Wrap" />
+          </StackPanel>
+          <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,16,0,0">
+            <Border Height="1" Background="{DynamicResource SubtleBorderBrush}" Margin="8,0,8,8" />
+            <Button x:Name="UpdateButton" Classes="accent" HorizontalAlignment="Stretch"
+                    Command="{Binding DownloadUpdateCommand}" IsVisible="{Binding Updates.IsUpdateAvailable}"
+                    Content="{Binding UpdateText}" ToolTip.Tip="{Binding UpdateTip}" />
+            <Button Classes="navlink" AutomationProperties.Name="GitHub" HorizontalAlignment="Stretch" Click="OnOpenGitHub" ToolTip.Tip="{Binding RepositoryUrl}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <PathIcon Width="15" Height="15" Data="{StaticResource Icon.GitHub}" />
+                <TextBlock Text="GitHub" />
+              </StackPanel>
+            </Button>
+            <TextBlock x:Name="VersionLabel" Classes="caption" Margin="10,0" Text="{Binding VersionText}" />
+          </StackPanel>
+          <ListBox Classes="nav" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:NavItem">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                  <PathIcon Width="17" Height="17" Data="{Binding Icon}" />
+                  <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </Border>
+      <Border Grid.Column="2" Classes="orbitGlass" ClipToBounds="True">
+        <Grid RowDefinitions="58,*">
+          <Border BorderBrush="{DynamicResource SubtleBorderBrush}" BorderThickness="0,0,0,1" Padding="24,0">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="{Binding SelectedItem.Title}" VerticalAlignment="Center" FontWeight="SemiBold" />
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+                <Ellipse Fill="{DynamicResource AccentBrush}" Width="6" Height="6" />
+                <TextBlock Text="FileOrbit" Classes="caption" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <ScrollViewer Grid.Row="1" x:Name="PageScroller" VerticalScrollBarVisibility="{Binding PageScroll}">
+            <ContentControl Classes="page" Content="{Binding CurrentPage}" Margin="28,24,28,28" MaxWidth="980" HorizontalAlignment="Stretch" />
+          </ScrollViewer>
+        </Grid>
+      </Border>
+    </Grid>
+  </Border>
+</Window>

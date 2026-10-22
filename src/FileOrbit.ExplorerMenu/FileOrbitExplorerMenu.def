@@ -1,0 +1,5 @@
+; Exports of the Explorer context-menu COM server (see FileOrbitExplorerMenu.c).
+LIBRARY FileOrbitExplorerMenu
+EXPORTS
+    DllGetClassObject PRIVATE
+    DllCanUnloadNow PRIVATE

@@ -1,29 +1,29 @@
-// Makes Filee-<version>-win-Setup.exe: appends the published app (an LZMA payload with a SHA-256 manifest, see
-// src/Filee.Setup/Payload/SetupPayload.cs) to the published Setup program. The engines Setup offers on a fresh install
+// Makes FileOrbit-<version>-win-Setup.exe: appends the published app (an LZMA payload with a SHA-256 manifest, see
+// src/FileOrbit.Setup/Payload/SetupPayload.cs) to the published Setup program. The engines Setup offers on a fresh install
 // come from EngineDownloads (engines.json), so Setup offers exactly what Settings → Engines offers.
 // Run by build/build-installer.ps1:
-//   dotnet run build/tools/make-setup.cs -- <Filee.Setup.exe> <publish folder> <version> <output .exe> [--fast]
+//   dotnet run build/tools/make-setup.cs -- <FileOrbit.Setup.exe> <publish folder> <version> <output .exe> [--fast]
 // LZMA with a 48 MB dictionary, programs through the x86 branch filter; --fast uses a small dictionary, for checks.
-#:project ../../src/Filee.Setup/Filee.Setup.csproj
-#:project ../../src/Filee.Engines/Filee.Engines.csproj
+#:project ../../src/FileOrbit.Setup/FileOrbit.Setup.csproj
+#:project ../../src/FileOrbit.Engines/FileOrbit.Engines.csproj
 #:property PublishAot=false
 
 using System.Diagnostics;
 using System.Reflection;
-using Filee.Engines.Infrastructure;
-using Filee.Setup.Payload;
+using FileOrbit.Engines.Infrastructure;
+using FileOrbit.Setup.Payload;
 
 var fast = args.Contains("--fast");
 var positional = args.Where(a => a != "--fast").ToArray();
 if (positional.Length != 4)
 {
-    Console.Error.WriteLine("usage: dotnet run build/tools/make-setup.cs -- <Filee.Setup.exe> <publish folder> <version> <output .exe> [--fast]");
+    Console.Error.WriteLine("usage: dotnet run build/tools/make-setup.cs -- <FileOrbit.Setup.exe> <publish folder> <version> <output .exe> [--fast]");
     return 2;
 }
 var (program, app, version, output) = (positional[0], positional[1], positional[2], positional[3]);
-if (!File.Exists(Path.Combine(app, "Filee.exe")))
+if (!File.Exists(Path.Combine(app, "FileOrbit.exe")))
 {
-    Console.Error.WriteLine($"Filee.exe is missing in {app}");
+    Console.Error.WriteLine($"FileOrbit.exe is missing in {app}");
     return 1;
 }
 

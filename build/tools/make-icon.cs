@@ -19,12 +19,12 @@ const string svg = """
   <circle cx="397" cy="216" r="24" fill="#B8FFF1" stroke="#FFFFFF" stroke-width="4"/>
 </svg>
 """;
-var outDir = Path.Combine("src", "Filee.App", "Assets", "Icons");
+var outDir = Path.Combine("src", "FileOrbit.App", "Assets", "Icons");
 Directory.CreateDirectory(outDir);
-File.WriteAllText(Path.Combine(outDir, "filee.svg"), svg);
+File.WriteAllText(Path.Combine(outDir, "fileorbit.svg"), svg);
 var settings = new MagickReadSettings { BackgroundColor = MagickColors.Transparent, Format = MagickFormat.Svg };
 using var master = new MagickImage(Encoding.UTF8.GetBytes(svg), settings);
-master.Write(Path.Combine(outDir, "filee.png"), MagickFormat.Png);
+master.Write(Path.Combine(outDir, "fileorbit.png"), MagickFormat.Png);
 master.Settings.SetDefine(MagickFormat.Icon, "auto-resize", "256,64,48,32,24,16");
-master.Write(Path.Combine(outDir, "filee.ico"), MagickFormat.Icon);
+master.Write(Path.Combine(outDir, "fileorbit.ico"), MagickFormat.Icon);
 Console.WriteLine($"FileOrbit icons written to {outDir}");

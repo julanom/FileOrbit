@@ -1,0 +1,71 @@
+<!--
+  FileOrbit.App: the Avalonia desktop application (tray, donut toolbar, settings window).
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>FileOrbit</AssemblyName>
+    <RootNamespace>FileOrbit.App</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\Icons\fileorbit.ico</ApplicationIcon>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FileOrbit.Core\FileOrbit.Core.csproj" />
+    <ProjectReference Include="..\FileOrbit.Engines\FileOrbit.Engines.csproj" />
+    <ProjectReference Include="..\FileOrbit.Platform.Windows\FileOrbit.Platform.Windows.csproj" />
+    <ProjectReference Include="..\FileOrbit.Platform.Linux\FileOrbit.Platform.Linux.csproj" />
+    <ProjectReference Include="..\FileOrbit.Platform.MacOS\FileOrbit.Platform.MacOS.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Avalonia.Controls.ColorPicker" />
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Markdig" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="SharpHook" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+    <!-- Upstream promotional assets and release tours are not FileOrbit product content. -->
+    <AvaloniaResource Remove="Assets\Sponsors\**;Assets\WhatsNew\**" />
+    <!-- Shown on the About page. -->
+    <AvaloniaResource Include="..\..\THIRD-PARTY-NOTICES.md" Link="Assets\THIRD-PARTY-NOTICES.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FileOrbit.App.Tests" />
+  </ItemGroup>
+
+  <!-- Native debug symbols from NuGet packages (SkiaSharp, HarfBuzz: ~100 MB) are useless to users. -->
+  <Target Name="FileOrbitRemoveNativeSymbols" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <_FileOrbitNativePdb Include="$(PublishDir)lib*.pdb" />
+    </ItemGroup>
+    <Delete Files="@(_FileOrbitNativePdb)" />
+  </Target>
+
+  <!-- Repository URL for the updater / About page, taken from Directory.Build.props. -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>RepositoryUrl</_Parameter1>
+      <_Parameter2>$(FileOrbitRepositoryUrl)</_Parameter2>
+    </AssemblyAttribute>
+    <!-- Published builds (installer, portable zip) set -p:FileOrbitRelease=true: only they register Explorer and startup
+         entries (UpdateService.IsReleaseBuild), so running from source leaves the user's system alone. -->
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="'$(FileOrbitRelease)' == 'true'">
+      <_Parameter1>FileOrbitRelease</_Parameter1>
+      <_Parameter2>true</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>

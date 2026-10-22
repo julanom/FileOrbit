@@ -14,13 +14,13 @@
          parameters of a member is fine (CS1573). -->
     <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
 
-    <Version>2.1.0-fileorbit.2</Version>
+    <Version>2.1.0-fileorbit.3</Version>
     <Product>FileOrbit</Product>
     <Authors>FileOrbit contributors</Authors>
-    <Copyright>Copyright (c) Filee and FileOrbit contributors</Copyright>
+    <Copyright>Copyright (c) FileOrbit contributors</Copyright>
 
     <!-- Single source of truth for the GitHub repository (used by the updater and the About page). -->
-    <FileeRepositoryUrl>https://github.com/julanom/FileOrbit</FileeRepositoryUrl>
-    <RepositoryUrl>$(FileeRepositoryUrl)</RepositoryUrl>
+    <FileOrbitRepositoryUrl>https://github.com/julanom/FileOrbit</FileOrbitRepositoryUrl>
+    <RepositoryUrl>$(FileOrbitRepositoryUrl)</RepositoryUrl>
   </PropertyGroup>
 </Project>

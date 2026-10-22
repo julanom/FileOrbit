@@ -15,8 +15,8 @@ if target.is_symlink() or target.resolve() != expected:
 if (target / '.fileorbit-package').read_text(encoding='utf-8').strip() != 'com.fileorbit.app':
     raise SystemExit('The directory is not an installation created by FileOrbit.')
 PY
-"$install_dir/Filee" --uninstall-cleanup
-if [ -L "$HOME/.local/bin/fileorbit" ] && [ "$(readlink "$HOME/.local/bin/fileorbit")" = "$install_dir/filee-cli" ]; then
+"$install_dir/FileOrbit" --uninstall-cleanup
+if [ -L "$HOME/.local/bin/fileorbit" ] && [ "$(readlink "$HOME/.local/bin/fileorbit")" = "$install_dir/fileorbit-cli" ]; then
     rm -- "$HOME/.local/bin/fileorbit"
 fi
 if [ -f "$desktop_file" ] && grep -q '^X-FileOrbit-Managed=true$' "$desktop_file"; then

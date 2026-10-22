@@ -7,11 +7,11 @@
     <key>CFBundleIdentifier</key><string>com.fileorbit.app</string>
     <key>CFBundleName</key><string>FileOrbit</string>
     <key>CFBundleDisplayName</key><string>FileOrbit</string>
-    <key>CFBundleExecutable</key><string>Filee</string>
+    <key>CFBundleExecutable</key><string>FileOrbit</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>__VERSION__</string>
     <key>CFBundleVersion</key><string>__BUNDLE_VERSION__</string>
-    <key>CFBundleIconFile</key><string>filee.icns</string>
+    <key>CFBundleIconFile</key><string>fileorbit.icns</string>
     <key>LSMinimumSystemVersion</key><string>13.0</string>
     <key>NSHighResolutionCapable</key><true/>
     <!-- FileOrbit is a menu-bar utility, not a document app. Running as an agent keeps it out of the Dock and makes

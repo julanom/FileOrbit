@@ -1,0 +1,12 @@
+{
+    "KPlugin": {
+        "Id": "fileorbit-donut",
+        "Name": "FileOrbit donut at the cursor",
+        "Description": "Moves FileOrbit's donut window to the cursor, which Wayland apps cannot do themselves.",
+        "License": "MIT",
+        "Version": "1.0"
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js",
+    "KPackageStructure": "KWin/Script"
+}
