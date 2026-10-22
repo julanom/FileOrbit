@@ -21,6 +21,17 @@ public enum FileActionKind
 
 public sealed class FileActionService(ShelfService shelf)
 {
+    private const string TerminalScript = """
+        on run argv
+          tell application "Terminal"
+            activate
+            repeat with folderPath in argv
+              do script "cd " & quoted form of (contents of folderPath)
+            end repeat
+          end tell
+        end run
+        """;
+
     private const string AirDropScript = """
         ObjC.import('AppKit');
         ObjC.import('Foundation');
@@ -212,10 +223,20 @@ public sealed class FileActionService(ShelfService shelf)
     {
         if (!OperatingSystem.IsMacOS())
             throw new PlatformNotSupportedException("Open in Terminal is currently available on macOS.");
-        foreach (var directory in paths.Select(path => Directory.Exists(path) ? path : Path.GetDirectoryName(path))
-                     .OfType<string>().Distinct(StringComparer.Ordinal))
-            Run("/usr/bin/open", ["-a", "Terminal", directory]);
+        var directories = TerminalDirectories(paths);
+        if (directories.Count == 0)
+            throw new FileNotFoundException("The selected files no longer exist.");
+        // `open -a Terminal <folder>` only opens Terminal; it does not give the new tab a working directory.
+        // Pass paths as AppleScript arguments, rather than constructing a shell command, so spaces and quotes stay safe.
+        Run("/usr/bin/osascript", ["-e", TerminalScript, .. directories]);
     }
+
+    internal static IReadOnlyList<string> TerminalDirectories(IEnumerable<string> paths) =>
+        paths.Select(path => Directory.Exists(path) ? path : Path.GetDirectoryName(path))
+             .OfType<string>()
+             .Select(Path.GetFullPath)
+             .Distinct(StringComparer.Ordinal)
+             .ToArray();
 
     private static void Run(string executable, IReadOnlyList<string> arguments)
     {

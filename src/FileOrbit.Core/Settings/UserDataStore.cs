@@ -403,6 +403,11 @@ internal static class SettingsMigrations
         if (settings.SchemaVersion < 21)
             InsertBefore(settings.EnginePriority, "wic", settings.EnginePriority.Contains("ffmpeg") ? "ffmpeg" : "pandoc");
 
+        // v33: FileOrbit has its own public release feed. Earlier builds kept this off to avoid offering an unrelated
+        // upstream app; turn it on now, while leaving the Settings toggle available for anyone who opts out.
+        if (settings.SchemaVersion < 33)
+            settings.CheckForUpdates = true;
+
         if (settings.Triggers.Count == 0)
             settings.Triggers = TriggerGesture.Defaults();
 

@@ -112,7 +112,7 @@ public sealed class DonutSettings
 public sealed class AppSettings
 {
     /// <summary>Current schema version. Increase when the format changes and add a migration.</summary>
-    public const int CurrentSchemaVersion = 32;
+    public const int CurrentSchemaVersion = 33;
 
     public int SchemaVersion { get; set; } = CurrentSchemaVersion;
 
@@ -124,9 +124,8 @@ public sealed class AppSettings
     /// <summary>Show the Explorer "Convert with FileOrbit" context menu entry.</summary>
     public bool ContextMenuEnabled { get; set; } = true;
 
-    // A fork must not install upstream FileOrbit releases over itself. Updates can be re-enabled once FileOrbit has its
-    // own signed release feed.
-    public bool CheckForUpdates { get; set; }
+    /// <summary>Check FileOrbit's own GitHub release feed and offer each newer public release.</summary>
+    public bool CheckForUpdates { get; set; } = true;
 
     /// <summary>What closing the main window does. A value from a newer FileOrbit reads as <see cref="CloseAction.Ask"/>.</summary>
     [JsonConverter(typeof(LenientEnumJsonConverter<CloseAction>))]

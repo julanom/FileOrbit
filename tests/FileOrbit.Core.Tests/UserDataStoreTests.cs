@@ -6,6 +6,23 @@ namespace FileOrbit.Core.Tests;
 
 public class UserDataStoreTests
 {
+    [Fact]
+    public void Previous_versions_enable_FileOrbit_release_checks()
+    {
+        using var dir = new TempDir();
+        var store = new UserDataStore(dir.Path);
+        store.Load();
+        store.Settings.SchemaVersion = 32;
+        store.Settings.CheckForUpdates = false;
+        store.SaveSettings();
+
+        var upgraded = new UserDataStore(dir.Path);
+        upgraded.Load();
+
+        Assert.True(upgraded.Settings.CheckForUpdates);
+        Assert.Equal(AppSettings.CurrentSchemaVersion, upgraded.Settings.SchemaVersion);
+    }
+
     [Theory]
     [InlineData(30)]
     [InlineData(31)]

@@ -5,6 +5,22 @@ namespace FileOrbit.App.Tests;
 public sealed class FileActionServiceTests
 {
     [Fact]
+    public void Terminal_uses_the_containing_folder_for_files_and_the_folder_itself_for_folders()
+    {
+        using var temp = new ActionTempDirectory();
+        var notes = Directory.CreateDirectory(Path.Combine(temp.Path, "Notes"));
+        var projects = Directory.CreateDirectory(Path.Combine(temp.Path, "Projects"));
+        var first = Path.Combine(notes.FullName, "plan.txt");
+        var second = Path.Combine(notes.FullName, "another.txt");
+        File.WriteAllText(first, "one");
+        File.WriteAllText(second, "two");
+
+        var directories = FileActionService.TerminalDirectories([first, projects.FullName, second, projects.FullName]);
+
+        Assert.Equal([notes.FullName, projects.FullName], directories);
+    }
+
+    [Fact]
     public async Task Copy_is_recursive_unicode_safe_and_collision_safe()
     {
         using var temp = new ActionTempDirectory();
